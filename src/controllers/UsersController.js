@@ -1,33 +1,64 @@
-import { readFile, writeFile } from 'fs/promises'
+import { readFileSync, writeFileSync } from 'fs';
 
-const path = new URL('../../__mocks__/users.json', import.meta.url)
-const users = JSON.parse(await readFile(path))
+const path = new URL('../../__mocks__/users.json', import.meta.url);
 
-function findUserById(id) {
-  return users.find(user => user.id === id)
+function getUsers() {
+    return JSON.parse(readFileSync(path));
+}
+
+function findUserByProperty(value, property) {
+    return getUsers().find((user) => user[property] === value);
+}
+
+function valideInputs(user) {
+    let erros = [];
+    if (findUserByProperty(user.email, 'email')) {
+        erros.push('Email já cadastrado.');
+    }
+
+    if (findUserByProperty(user.cpf, 'cpf')) {
+        erros.push('CPF já cadastrado.');
+    }
+
+    return erros.length && erros;
 }
 
 export default {
-  read (req, res) {
-    const user = findUserById(req.params.id)
-    res.status(200).send({ data: user })
-  },
+    read(req, res) {
+        const user = findUserByProperty(req.params.id, 'id');
+        res.status(200).send({ data: user });
+    },
 
-  update (req, res) {
-    const { user } = req.body
+    create(req, res) {
+        const { user } = req.body;
+        user.id = new Date().toISOString().replace(/[^\w\s]/gi, '')
 
-    const index = users.findIndex(u => u.id === user.id)
+        let erros = valideInputs(user);
+        if (erros) {
+            return res.status(403).send({ message: erros });
+        }
 
-    if (index === -1) {
-      return res.status(418)
-    }
+        const users = getUsers();
+        users.push(user)
+        writeFileSync(path, JSON.stringify(users, null, 4));
+    },
 
-    delete user.iat
-    delete user.exp
+    update(req, res) {
+        const { user } = req.body;
 
-    users.splice(index, 1, user)
-      
-    writeFile(path, JSON.stringify(users))
-    res.status(200).send({ user })
-  }
-}
+        const users = getUsers();
+        const index = users.findIndex((u) => u.id === user.id);
+
+        if (index === -1) {
+            return res.status(418);
+        }
+
+        delete user.iat;
+        delete user.exp;
+
+        users.splice(index, 1, user);
+
+        writeFileSync(path, JSON.stringify(users, null, 4));
+        res.status(200).send({ user });
+    },
+};
