@@ -11,16 +11,18 @@ function findUserByProperty(value, property) {
 }
 
 function valideInputs(user) {
-    let erros = [];
-    if (findUserByProperty(user.email, 'email')) {
-        erros.push('Email já cadastrado.');
+    let erros = {};
+    let tempUser = findUserByProperty(user.email, 'email')
+    if (tempUser && tempUser.email) {
+        erros['email'] = 'já cadastrado.';
     }
 
-    if (findUserByProperty(user.cpf, 'cpf')) {
-        erros.push('CPF já cadastrado.');
+    tempUser = findUserByProperty(user.cpf, 'cpf')
+    if (tempUser && tempUser.cpf) {
+        erros['cpf'] = 'já cadastrado.';
     }
 
-    return erros.length && erros;
+    return (erros.email || erros.cpf) && erros;
 }
 
 export default {
@@ -31,16 +33,20 @@ export default {
 
     create(req, res) {
         const { user } = req.body;
+
         user.id = new Date().toISOString().replace(/[^\w\s]/gi, '')
+        user.cpf.replace(/[^\w\s]/gi, '')
+        delete user.confirmation
 
         let erros = valideInputs(user);
         if (erros) {
-            return res.status(403).send({ message: erros });
+            return res.status(403).send({ erros });
         }
 
         const users = getUsers();
         users.push(user)
         writeFileSync(path, JSON.stringify(users, null, 4));
+        res.status(200).send({ ok: true });
     },
 
     update(req, res) {

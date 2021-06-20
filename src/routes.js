@@ -16,7 +16,7 @@ routes.get(
     AuthController.loadSession
 );
 
-routes.get('/users/:id', AuthController.validateSession, UsersController.read);
+routes.post('/register-user', UsersController.create);
 routes.put(
     '/update-user',
     AuthController.validateSession,
