@@ -1,0 +1,32 @@
+{
+  "name": "petplace-api",
+  "version": "1.0.0",
+  "description": "A simple Node.js API for PetPlace application.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node_modules/.bin/nodemon src/app.js --exec babel-node --",
+    "clean": "rm -rf build && mkdir build",
+    "prebuild": "babel -d ./build ./src -s",
+    "build": "npm run clean && npm run prebuild"
+  },
+  "keywords": [],
+  "author": "matttalves@gmail.com",
+  "type": "module",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.0",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "nodemon": "^1.19.1"
+  },
+  "engines": {
+    "node": "10.x"
+  }
+}
