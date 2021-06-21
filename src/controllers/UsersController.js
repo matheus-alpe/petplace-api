@@ -67,4 +67,20 @@ export default {
         writeFileSync(path, JSON.stringify(users, null, 4));
         res.status(200).send({ user });
     },
+
+    delete(req, res) {
+        const { user } = req.body;
+
+        const users = getUsers();
+        const index = users.findIndex((u) => u.id === user.id);
+
+        if (index === -1) {
+            return res.status(404);
+        }
+
+        users.splice(index, 1);
+
+        writeFileSync(path, JSON.stringify(users, null, 4));
+        res.status(200);
+    }
 };

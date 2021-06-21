@@ -22,5 +22,6 @@ routes.put(
     AuthController.validateSession,
     UsersController.update
 );
+routes.post('/delete-user', AuthController.validateSession, UsersController.delete)
 
 export { routes };

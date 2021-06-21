@@ -10,6 +10,11 @@ function getUsers() {
     return users;
 }
 
+function findUserByProperty(value, property) {
+    return getUsers().find((user) => user[property] === value);
+}
+
+
 export default {
     authenticate(req, res) {
         const { email, password } = req.body;
@@ -71,9 +76,17 @@ export default {
                 return;
             }
 
+            const tempUser = findUserByProperty(decoded.id, 'id')
+            if (!tempUser) {
+                res.status(401).send({
+                    message: 'Sua sessão é inválida ou está expirada',
+                });
+                return;
+            }
+
             res.status(200).send({
                 token,
-                user: decoded,
+                user: tempUser,
             });
         });
     },
