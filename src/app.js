@@ -1,10 +1,12 @@
 import cors from 'cors';
 import express from 'express';
 import fileUpload from 'express-fileupload';
-import { routes } from './routes.js';
 import path from 'path';
+import { routes } from './routes.js';
+import './db.js';
 
-var __dirname = path.resolve(path.dirname(''));
+
+const __dirname = path.resolve(path.dirname(''));
 
 const app = express();
 

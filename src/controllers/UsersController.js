@@ -1,4 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs';
+import { getUsers as test } from '../db.js'
+test(1)
 
 const path = new URL('../../__mocks__/users.json', import.meta.url);
 
