@@ -1,6 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { getUsers as test } from '../db.js'
-test(1)
+import { deleteUser, getUserByProperty, setNewUser, updateUser } from '../db.js'
 
 const path = new URL('../../__mocks__/users.json', import.meta.url);
 
@@ -13,18 +12,24 @@ function findUserByProperty(value, property) {
 }
 
 function valideInputs(user) {
-    let erros = {};
-    let tempUser = findUserByProperty(user.email, 'email')
-    if (tempUser && tempUser.email) {
-        erros['email'] = 'já cadastrado.';
-    }
+    return new Promise(async function (resolve) {
+        let erros = {};
+        let tempUser = await getUserByProperty(user.email, 'email')
 
-    tempUser = findUserByProperty(user.cpf, 'cpf')
-    if (tempUser && tempUser.cpf) {
-        erros['cpf'] = 'já cadastrado.';
-    }
+        if (tempUser && tempUser.email) {
+            erros['email'] = 'já cadastrado.';
+        }
 
-    return (erros.email || erros.cpf) && erros;
+        tempUser = await getUserByProperty(user.cpf, 'cpf')
+        if (tempUser && tempUser.cpf) {
+            erros['cpf'] = 'já cadastrado.';
+        }
+
+        if (erros.email || erros.cpf) {
+            resolve(erros);
+        };
+        resolve();
+    });
 }
 
 export default {
@@ -33,56 +38,44 @@ export default {
         res.status(200).send({ data: user });
     },
 
-    create(req, res) {
+    async create(req, res) {
         const { user } = req.body;
 
         user.id = new Date().toISOString().replace(/[^\w\s]/gi, '')
-        user.cpf.replace(/[^\w\s]/gi, '')
+        user.cpf = user.cpf.replace(/[^\w\s]/gi, '')
         delete user.confirmation
 
-        let erros = valideInputs(user);
+        const erros = await valideInputs(user);
         if (erros) {
             return res.status(403).send({ erros });
         }
 
-        const users = getUsers();
-        users.push(user)
-        writeFileSync(path, JSON.stringify(users, null, 4));
+        await setNewUser(user)
         res.status(200).send({ ok: true });
     },
 
-    update(req, res) {
+    async update(req, res) {
         const { user } = req.body;
 
-        const users = getUsers();
-        const index = users.findIndex((u) => u.id === user.id);
-
-        if (index === -1) {
-            return res.status(418);
+        if (!user.id) {
+            return res.status(404);
         }
 
         delete user.iat;
         delete user.exp;
 
-        users.splice(index, 1, user);
-
-        writeFileSync(path, JSON.stringify(users, null, 4));
+        await updateUser(user);
         res.status(200).send({ user });
     },
 
-    delete(req, res) {
+    async delete(req, res) {
         const { user } = req.body;
 
-        const users = getUsers();
-        const index = users.findIndex((u) => u.id === user.id);
-
-        if (index === -1) {
+        if (!user.id) {
             return res.status(404);
         }
 
-        users.splice(index, 1);
-
-        writeFileSync(path, JSON.stringify(users, null, 4));
-        res.status(200);
+        await deleteUser(user);
+        res.status(202);
     }
 };

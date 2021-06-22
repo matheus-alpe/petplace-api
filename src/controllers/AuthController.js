@@ -1,43 +1,32 @@
 import JWT from 'jsonwebtoken';
-import { readFileSync } from 'fs';
+import { authenticateUser, getUserByProperty } from '../db.js';
 
 const SECRET = 'TEST';
 
-function getUsers() {
-    const users = JSON.parse(
-        readFileSync(new URL('../../__mocks__/users.json', import.meta.url))
-    );
-    return users;
-}
-
-function findUserByProperty(value, property) {
-    return getUsers().find((user) => user[property] === value);
-}
-
-
 export default {
-    authenticate(req, res) {
+    async authenticate(req, res) {
         const { email, password } = req.body;
 
-        let user = getUsers().filter(
-            (user) => user.email === email && user.password === password
-        )[0];
+        let result = await authenticateUser(email, password);
 
-        if (user) {
-            const token = JWT.sign(user, SECRET, {
-                expiresIn: 7200,
-            });
+        if (!result)
+            return res
+                .status(403)
+                .send({ message: 'E-mail ou Senha incorreto.' });
 
-            res.status(200).send({
-                message: 'Login efetuado com sucesso',
-                token,
-                user,
-            });
+        const user = { ...result };
 
-            return;
-        }
+        const token = JWT.sign(user, SECRET, {
+            expiresIn: 7200,
+        });
 
-        res.status(403).send({ message: 'E-mail ou Senha incorreto.' });
+        res.status(200).send({
+            message: 'Login efetuado com sucesso',
+            token,
+            user,
+        });
+
+        return;
     },
 
     validateSession(req, res, next) {
@@ -47,7 +36,7 @@ export default {
 
         if (!token) {
             res.status(401).send({
-                message: '1 Sua sessão é inválida ou está expirada',
+                message: 'Sua sessão é inválida.',
             });
             return;
         }
@@ -55,7 +44,7 @@ export default {
         JWT.verify(token, SECRET, (err, decoded) => {
             if (err) {
                 res.status(401).send({
-                    message: '2 Sua sessão é inválida ou está expirada',
+                    message: 'Sua sessão está expirada.'
                 });
             }
 
@@ -68,25 +57,23 @@ export default {
     loadSession(req, res) {
         const token = req.headers.authorization.split(' ')[1];
 
-        JWT.verify(token, SECRET, (err, decoded) => {
+        JWT.verify(token, SECRET, async (err, decoded) => {
             if (err) {
-                res.status(401).send({
+                return res.status(401).send({
                     message: 'Sua sessão é inválida ou está expirada',
                 });
-                return;
             }
 
-            const tempUser = findUserByProperty(decoded.id, 'id')
+            const tempUser = await getUserByProperty(decoded.id, 'id');
             if (!tempUser) {
-                res.status(401).send({
+                return res.status(401).send({
                     message: 'Sua sessão é inválida ou está expirada',
                 });
-                return;
             }
 
             res.status(200).send({
                 token,
-                user: tempUser,
+                user: { ...tempUser },
             });
         });
     },
