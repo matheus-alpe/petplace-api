@@ -76,6 +76,6 @@ export default {
         }
 
         await deleteUser(user);
-        res.status(202);
+        res.status(200).send({ ok: true });
     }
 };
