@@ -86,3 +86,98 @@ export function deleteUser(user) {
         });
     });
 }
+
+///*PETS
+// TEM QUE REVER QUAIS VARIAVEIS SERÃO USADAS
+// imagino que a inserção de vacinas e de fotos do pet será feita separada, por isso nao coloquei aqui
+export function setNewPet(pet){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) => {
+            if(err) throw err;
+            
+            connection.query(`INSERT INTO pets VALUES ('${pet.id}', '${pet.nome}', '${pet.raca}', '${pet.sexo}', '${pet.idade}', '${pet.image}', '${pet.userID}')`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+//CONFIRMAR QUAL VAI SER A CHAVE SECUNDÁRIA NA TABELA DE PETS
+export function showYourPets(user){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) =>{
+            if(err) throw err;
+            connection.query(`SELECT * FROM pets WHERE userID = ${user.id}`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(rows);
+            });
+        });
+    });
+}
+
+export function getPetByProperty(value, property){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection) => {
+            if (err) throw err;
+            connection.query(`SELECT * FROM pets WHERE ${property} = '${value}'`,(err, rows) => {
+                if(err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+//value esperado para ser a ID do pet
+//pensei em usar para pegar imagens ou vacinas
+export function getPropertyFromPet(property, value){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+            connection.query(`SELECT ${property} FROM pets WHERE petID = '${value}'`, (err,rows) => {
+                if(err) reject(err);
+
+                resolve(rows);
+            });
+        });
+    });
+}
+
+export function updatePet(pet) { 
+    return new Promise(function (resolve, reject) {
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+           
+            connection.query(`UPDATE pets SET nome = '${pet.nome}', raca = '${pet.raca}', sexo = '${pet.sexo}', idade = '${pet.idade}', image = '${pet.image}', userID = '${pet.userID}' WHERE id = '${pet.id}';`, (err, rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+export function deletePet(pet) {
+    return new Promise(function (resolve, reject) {
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+    
+            connection.query('DELETE FROM pets WHERE id = ?', [pet.id], (err, rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+
+
+
+//*/
