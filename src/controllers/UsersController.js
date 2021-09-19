@@ -11,7 +11,7 @@ function findUserByProperty(value, property) {
     return getUsers().find((user) => user[property] === value);
 }
 
-function valideInputs(user) {
+function validateInputs(user) {
     return new Promise(async function (resolve) {
         let erros = {};
         let tempUser = await getUserByProperty(user.email, 'email')
@@ -45,7 +45,7 @@ export default {
         user.cpf = user.cpf.replace(/[^\w\s]/gi, '')
         delete user.confirmation
 
-        const erros = await valideInputs(user);
+        const erros = await validateInputs(user);
         if (erros) {
             return res.status(403).send({ erros });
         }
