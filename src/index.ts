@@ -1,20 +1,15 @@
-import "reflect-metadata";
-import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import 'reflect-metadata'
+import { createConnection } from 'typeorm'
+import express from 'express'
+import { routes } from './routes/UserRoutes'
 
-createConnection().then(async connection => {
+createConnection()
 
-    console.log("Inserting a new user into the database...");
-    const user = new User();
-    user.name = "Timber";
-    user.created_at = new Date();
-    await connection.manager.save(user);
-    console.log("Saved a new user with id: " + user.id);
+const app = express()
 
-    console.log("Loading users from the database...");
-    const users = await connection.manager.find(User);
-    console.log("Loaded users: ", users);
+app.use(express.json())
+app.use(routes)
 
-    console.log("Here you can setup and run express/koa/any other framework.");
-
-}).catch(error => console.log(error));
+app.listen(3333, () => {
+    console.log('running on 3333')
+})
