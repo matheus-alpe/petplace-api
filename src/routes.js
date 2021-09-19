@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import AuthController from './controllers/AuthController.js';
 import UsersController from './controllers/UsersController.js';
+import PetsController from './controllers/PetsController.js';
 
 const routes = Router();
 
@@ -22,6 +23,13 @@ routes.put(
     AuthController.validateSession,
     UsersController.update
 );
-routes.post('/delete-user', AuthController.validateSession, UsersController.delete)
+routes.post('/delete-user', AuthController.validateSession, UsersController.delete);
+
+//pets
+routes.post('/register-pet', PetsController.create);
+
+routes.put('/update-pet', PetsController.update);
+
+routes.post('/delete=pet', PetsController.delete)
 
 export { routes };

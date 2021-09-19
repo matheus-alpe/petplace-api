@@ -50,7 +50,7 @@ export default {
             return res.status(403).send({ erros });
         }
 
-        await setNewUser(user)
+        await setNewUser(user);
         res.status(200).send({ ok: true });
     },
 

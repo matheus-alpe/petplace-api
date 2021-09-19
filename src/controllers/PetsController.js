@@ -21,10 +21,27 @@ export default {
     async create(req,res){
         const { pet } = req.body;
 
-        await setNewPet(pet)
+        await setNewPet(pet);
         res.status(200).send({ ok: true });
     },
 
+    async update(req,res){
+        const { pet } = req.body;
+
+        if(!pet.id) return res.status(404);
+
+        await updatePet(pet);
+        res.status(200).send({ pet });
+    },
+
+    async delete(req,res) {
+        const { pet } = req.body;
+
+        if(!pet.id) return res.status(404);
+
+        await deletePet(pet);
+        res.status(200).send({ ok: true });
+    }
 }
 
 
