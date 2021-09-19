@@ -1,6 +1,6 @@
 import { create } from 'domain';
 import { readFileSync, writeFileSync} from 'fs';
-import { setNewPet, getPetByProperty, updatePet, deletePet } from '../db';
+import { setNewPet, getPetByProperty, updatePet, deletePet } from '../db.js';
 
 const path = new URL('../../__mocks__/pets.json', import.meta.url);
 

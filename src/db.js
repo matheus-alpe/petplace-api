@@ -3,12 +3,49 @@ dotenv.config();
 
 import mysql from 'mysql';
 
+/**
+ * Steps to setup database:
+ * 1. Create a database called 'petplace' on your MySQL server.
+ * 2. On the same level as package.json, create a file called '.env'
+ * 3. In this file '.env' create two variables:
+ *      DB_USER=<your-user-on-mysql>
+ *      DB_PASS=<password-to-your-user>
+ *      (Note: Each variables in his own line)
+ * 4. After all this steps you can run the project.
+ */
 const pool = mysql.createPool({
     host: 'localhost',
     user: process.env.BD_USER,
     password: process.env.BD_PASS,
-    database: "findpet"
+    database: 'petplace'
 });
+
+/**
+ * Create tables if they not exist for the first time it runs.
+ */
+pool.getConnection((err, connection) => {
+    if (err) throw err;
+
+    connection.query(`CREATE TABLE IF NOT EXISTS users (
+        id varchar(255) not null primary key,
+        name varchar(255) not null,
+        cpf varchar(255) not null,
+        image varchar(255) not null,
+        email varchar(255) not null,
+        password varchar(255) not null
+    );`)
+
+    connection.query(`CREATE TABLE IF NOT EXISTS pets (
+        id varchar(255) not null primary key,
+        name varchar(255) not null,
+        breed varchar(255) not null,
+        sex varchar(255) not null,
+        age date,
+        image varchar(255) not null,
+        user_id varchar(255),
+        constraint fk_idUser foreign key (user_id) references users (id)
+    );`)
+})
 
 export function getUserByProperty(value, property) {
     return new Promise(function (resolve) {
