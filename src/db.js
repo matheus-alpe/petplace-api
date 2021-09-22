@@ -29,21 +29,32 @@ pool.getConnection((err, connection) => {
     connection.query(`CREATE TABLE IF NOT EXISTS users (
         id varchar(255) not null primary key,
         name varchar(255) not null,
-        cpf varchar(255) not null,
         email varchar(255) not null,
-        image varchar(255) not null,
-        password varchar(255) not null
+        password varchar(255) not null,
+        avatar_url varchar(255) not null,
+        cpf varchar(255) ,
+        cnpj varchar(255) ,
+        cellphone varchar (255) not null,
+        telephone varchar (255) not null,
+        cep varchar (255) not null,
+        birthday date;
+        foundation date;
+        
     );`)
-
+//adoptable e adopted como varchar(3) pois aceitam Sim e não
     connection.query(`CREATE TABLE IF NOT EXISTS pets (
         id varchar(255) not null primary key,
+        avatar_url varchar(255) not null,
         name varchar(255) not null,
-        breed varchar(255) not null,
-        sex varchar(255) not null,
         age date,
-        image varchar(255) not null,
+        sex varchar(255) not null,
+        breed varchar(255) not null,
+        type varchar(255) not null,
+        adoptable varchar(3) not null, 
+        adopted varchar (3) not null,
+        birthday date,
         user_id varchar(255),
-        constraint fk_idUser foreign key (user_id) references users (id)
+        constraint fk_user_id foreign key (user_id) references users (id)
     );`)
 })
 
@@ -83,13 +94,23 @@ export function setNewUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-    
-            connection.query(`INSERT INTO users VALUES ('${user.id}', '${user.name}', '${user.cpf}', '${user.email}', '${user.image}', '${user.password}')`, (err, rows) => {
-                connection.release();
-                if (err) reject(err);
-                
-                resolve(true);
-            });
+            const { userTest } = user;
+            if(userTest.cpf == null && userTest.cnpj == null) throw err; //Verificando se cnpj ou cpf foram inseridos nos campos, se nenhum dos dois foi será enviada mensagem de erro
+            if(userTest.cpf == null){ //checa se foi inserido uma instituição
+                connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cnpj, cellphone, telephone, cep, foundation) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cnpj}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.foundation}')`, (err, rows) => {
+                    connection.release();
+                    if (err) reject(err);
+                    
+                    resolve(true);
+                });
+            }else{ // se foi inserido cpf 
+                connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cpf, cellphone, telephone, cep, birthday) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cpf}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.birthday}')`, (err, rows) => {
+                    connection.release();
+                    if (err) reject(err);
+                    
+                    resolve(true);
+                }); 
+            };            
         });
     });
 }
@@ -98,13 +119,21 @@ export function updateUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-    
-            connection.query(`UPDATE users SET name = '${user.name}', cpf = '${user.cpf}', email = '${user.email}', image = '${user.image}', password = '${user.password}' WHERE id = '${user.id}';`, (err, rows) => {
+            if(userTest.cpf == null){ //checa se foi inserido uma instituição
+            connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cpf = '${user.cpf}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 
                 resolve(true);
             });
+        }else{
+            connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cnpj = '${user.cnpj}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', foundation = '${user.foundation}' WHERE id = '${user.id}';`, (err, rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+        }
         });
     });
 }
@@ -132,7 +161,7 @@ export function setNewPet(pet){
         pool.getConnection((err, connection) => {
             if(err) throw err;
             
-            connection.query(`INSERT INTO pets VALUES ('${pet.id}', '${pet.nome}', '${pet.raca}', '${pet.sexo}', '${pet.idade}', '${pet.image}', '${pet.userID}')`, (err,rows) => {
+            connection.query(`INSERT INTO pets VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -147,7 +176,7 @@ export function showYourPets(user){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) =>{
             if(err) throw err;
-            connection.query(`SELECT * FROM pets WHERE userID = ${user.id}`, (err,rows) => {
+            connection.query(`SELECT * FROM pets WHERE user_id = ${user.id}`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -175,7 +204,7 @@ export function getPropertyFromPet(property, value){
     return new Promise(function(resolve,reject){
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            connection.query(`SELECT ${property} FROM pets WHERE petID = '${value}'`, (err,rows) => {
+            connection.query(`SELECT ${property} FROM pets WHERE id = '${value}'`, (err,rows) => {
                 if(err) reject(err);
 
                 resolve(rows);
@@ -189,7 +218,7 @@ export function updatePet(pet) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
            
-            connection.query(`UPDATE pets SET nome = '${pet.nome}', raca = '${pet.raca}', sexo = '${pet.sexo}', idade = '${pet.idade}', image = '${pet.image}', userID = '${pet.userID}' WHERE id = '${pet.id}';`, (err, rows) => {
+            connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -213,8 +242,6 @@ export function deletePet(pet) {
         });
     });
 }
-
-
-
-
 //*/
+
+//

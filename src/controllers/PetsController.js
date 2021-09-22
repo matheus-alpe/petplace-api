@@ -21,6 +21,8 @@ export default {
     async create(req,res){
         const { pet } = req.body;
 
+        pet.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
+
         await setNewPet(pet);
         res.status(200).send({ ok: true });
     },
