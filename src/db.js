@@ -15,8 +15,8 @@ import mysql from 'mysql';
  */
 const pool = mysql.createPool({
     host: 'localhost',
-    user: process.env.BD_USER,
-    password: process.env.BD_PASS,
+    user: 'root',
+    password: 'Melves',
     database: 'petplace'
 });
 
@@ -46,7 +46,7 @@ pool.getConnection((err, connection) => {
         id varchar(255) not null primary key,
         avatar_url varchar(255) not null,
         name varchar(255) not null,
-        age date,
+        age varchar(255),
         sex varchar(255) not null,
         breed varchar(255) not null,
         type varchar(255) not null,
@@ -138,21 +138,21 @@ export function updateUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            if(userTest.cpf == null){ //checks if user is a institution or normal person
-            connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cpf = '${user.cpf}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
-                connection.release();
-                if (err) reject(err);
+            if(user.cpf){ //checks if user is a institution or normal person
+                connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cpf = '${user.cpf}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
+                    connection.release();
+                    if (err) reject(err);
 
-                resolve(true);
-            });
-        }else{
-            connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cnpj = '${user.cnpj}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', foundation = '${user.foundation}' WHERE id = '${user.id}';`, (err, rows) => {
-                connection.release();
-                if (err) reject(err);
+                    resolve(true);
+                });
+            }else{
+                connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cnpj = '${user.cnpj}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', foundation = '${user.foundation}' WHERE id = '${user.id}';`, (err, rows) => {
+                    connection.release();
+                    if (err) reject(err);
 
-                resolve(true);
-            });
-        }
+                    resolve(true);
+                });
+            }
         });
     });
 }
@@ -180,7 +180,7 @@ export function setNewPet(pet){
         pool.getConnection((err, connection) => {
             if(err) throw err;
             
-            connection.query(`INSERT INTO pets VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
+            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -236,7 +236,7 @@ export function updatePet(pet) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-           
+            console.log(pet);
             connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);

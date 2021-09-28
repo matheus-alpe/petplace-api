@@ -23,7 +23,10 @@ routes.put(
     AuthController.validateSession,
     UsersController.update
 );
-routes.post('/delete-user', AuthController.validateSession, UsersController.delete);
+routes.post('/delete-user', 
+    AuthController.validateSession, 
+    UsersController.delete
+);
 
 //pets
 routes.post('/register-pet', PetsController.create);

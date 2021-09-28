@@ -15,7 +15,7 @@ function validateInputs(user) {
     return new Promise(async function (resolve) {
         let erros = {};
         let tempUser = await getUserByProperty(user.email, 'email')
-        console.log(tempUser);
+
         if (tempUser && tempUser.email) {
             erros['email'] = 'já cadastrado.';
         }
@@ -45,7 +45,8 @@ export default {
         const { user } = req.body;
 
         user.id = new Date().toISOString().replace(/[^\w\s]/gi, '')
-        user.cpf = user.cpf.replace(/[^\w\s]/gi, '')
+        if(user.cpf) user.cpf = user.cpf.replace(/[^\w\s]/gi, '')
+        if(user.cnpj) user.cnpj = user.cnpj.replace(/[^\w\s]/gi, '')
         delete user.confirmation
 
         const erros = await validateInputs(user);
