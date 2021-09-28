@@ -30,6 +30,6 @@ routes.post('/register-pet', PetsController.create);
 
 routes.put('/update-pet', PetsController.update);
 
-routes.post('/delete=pet', PetsController.delete)
+routes.post('/delete-pet', PetsController.delete);
 
 export { routes };

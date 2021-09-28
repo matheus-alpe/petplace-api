@@ -15,21 +15,17 @@ function validateInputs(user) {
     return new Promise(async function (resolve) {
         let erros = {};
         let tempUser = await getUserByProperty(user.email, 'email')
-
+        console.log(tempUser);
         if (tempUser && tempUser.email) {
             erros['email'] = 'já cadastrado.';
         }
-
-        if(tempUser.cpf==null){
-            tempUser = await getUserByProperty(user.cnpj, 'cnpj')
-            if (tempUser && tempUser.cnpj) {
-                erros['cnpj'] = 'já cadastrado.';
-            }
-        }else{
-            tempUser = await getUserByProperty(user.cpf, 'cpf')
-            if (tempUser && tempUser.cpf) {
-                erros['cpf'] = 'já cadastrado.';
-            }
+        
+        if (tempUser && tempUser.cnpj) {
+            erros['cnpj'] = 'já cadastrado.';
+        }
+        
+        if (tempUser && tempUser.cpf) {
+            erros['cpf'] = 'já cadastrado.';
         }
 
         if (erros.email || erros.cpf || erros.cnpj) {

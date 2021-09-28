@@ -35,13 +35,14 @@ pool.getConnection((err, connection) => {
         cpf varchar(255) ,
         cnpj varchar(255) ,
         cellphone varchar (255) not null,
-        telephone varchar (255) not null,
+        telephone varchar (255) ,
         cep varchar (255) not null,
-        birthday date;
-        foundation date;
+        birthday date,
+        foundation date
         
     );`)
-//adoptable e adopted como varchar(3) pois aceitam Sim e não
+//adoptable and adopted as varchar(3) as they should only accept 'sim' and 'não'
+//add past_owners_id
     connection.query(`CREATE TABLE IF NOT EXISTS pets (
         id varchar(255) not null primary key,
         avatar_url varchar(255) not null,
@@ -53,8 +54,27 @@ pool.getConnection((err, connection) => {
         adoptable varchar(3) not null, 
         adopted varchar (3) not null,
         birthday date,
-        user_id varchar(255),
-        constraint fk_user_id foreign key (user_id) references users (id)
+        user_id varchar(255) not null,
+        constraint fk_user_id foreign key (user_id) references users (id),
+        past_owners_id varchar(255)
+    );`)
+
+    connection.query(`CREATE TABLE IF NOT EXISTS vetHistory (
+        id varchar(255) not null primary key,
+        pet_id varchar(255) not null,
+        date DATE not null,
+        description varchar(255) not null,
+        constraint fk_pet_id foreign key (pet_id) references pets (id)
+    );`)
+
+    connection.query(`CREATE TABLE IF NOT EXISTS responsabilityTerm (
+        id varchar(255) not null primary key,
+        donator_id varchar(255) not null,
+        adopter_id varchar(255) not null,        
+        pet_id varchar(255) not null,
+        constraint fk_donator_id foreign key (donator_id) references users (id),
+        constraint fk_adopter_id foreign key (adopter_id) references users (id),
+        constraint fk_pet_idT foreign key (pet_id) references users (id)
     );`)
 })
 
@@ -94,16 +114,16 @@ export function setNewUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            const { userTest } = user;
-            if(userTest.cpf == null && userTest.cnpj == null) throw err; //Verificando se cnpj ou cpf foram inseridos nos campos, se nenhum dos dois foi será enviada mensagem de erro
-            if(userTest.cpf == null){ //checa se foi inserido uma instituição
+            const { cpf,cnpj } = user;
+            if(!cpf && !cnpj) throw err; //verifying if cpf or cnpj were inserted, if they werent error message will popup
+            if(!cpf){ //checks which of cpf and cnpj was inserted
                 connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cnpj, cellphone, telephone, cep, foundation) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cnpj}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.foundation}')`, (err, rows) => {
                     connection.release();
                     if (err) reject(err);
                     
                     resolve(true);
                 });
-            }else{ // se foi inserido cpf 
+            }else{
                 connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cpf, cellphone, telephone, cep, birthday) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cpf}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.birthday}')`, (err, rows) => {
                     connection.release();
                     if (err) reject(err);
@@ -119,7 +139,7 @@ export function updateUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            if(userTest.cpf == null){ //checa se foi inserido uma instituição
+            if(userTest.cpf == null){ //checks if user is a institution or normal person
             connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cpf = '${user.cpf}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);
