@@ -42,7 +42,6 @@ pool.getConnection((err, connection) => {
         
     );`)
 //adoptable and adopted as varchar(3) as they should only accept 'sim' and 'não'
-//add past_owners_id
     connection.query(`CREATE TABLE IF NOT EXISTS pets (
         id varchar(255) not null primary key,
         avatar_url varchar(255) not null,
