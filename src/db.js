@@ -162,7 +162,9 @@ export function deleteUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-    
+            connection.query('DELETE FROM pets WHERE user_id = ?', [user.id], (err, rows) =>{
+                if (err) reject(err);
+            });
             connection.query('DELETE FROM users WHERE id = ?', [user.id], (err, rows) => {
                 connection.release();
                 if (err) reject(err);
@@ -180,8 +182,8 @@ export function setNewPet(pet){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) => {
             if(err) throw err;
-            
-            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.region}', '${pet.user_id}')`, (err,rows) => {
+
+            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, region, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.region}', '${pet.user_id}')`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -195,6 +197,7 @@ export function updatePet(pet) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
+           
             connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}', '${pet.region}' WHERE id = '${pet.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);
@@ -220,11 +223,11 @@ export function deletePet(pet) {
     });
 }
 
-export function showYourPets(user){
+export function showUserPets(user){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) =>{
             if(err) throw err;
-            connection.query(`SELECT * FROM pets WHERE user_id = ${user.id}`, (err,rows) => {
+            connection.query(`SELECT * FROM pets WHERE user_id = '${user.id}'`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -234,28 +237,27 @@ export function showYourPets(user){
     });
 }
 
-export function getPetByProperty(value, property){
+export function getPetsByProperty(property, value){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection) => {
             if (err) throw err;
             connection.query(`SELECT * FROM pets WHERE ${property} = '${value}'`,(err, rows) => {
                 if(err) reject(err);
-
-                resolve(true);
+                resolve(rows);
             });
         });
     });
 }
 //value esperado para ser a ID do pet
 //pensei em usar para pegar imagens ou vacinas
-export function getPropertyFromPet(property, value){
+export function getPropertyFromPet(property, id){
     return new Promise(function(resolve,reject){
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            connection.query(`SELECT ${property} FROM pets WHERE id = '${value}'`, (err,rows) => {
+            connection.query(`SELECT ${property} FROM pets WHERE id = '${id}'`, (err,rows) => {
                 if(err) reject(err);
 
-                resolve(rows);
+                resolve(rows[0]);
             });
         });
     });

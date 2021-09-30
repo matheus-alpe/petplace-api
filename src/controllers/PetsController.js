@@ -1,6 +1,6 @@
 import { create } from 'domain';
 import { readFileSync, writeFileSync} from 'fs';
-import { setNewPet, getPetByProperty, updatePet, deletePet } from '../db.js';
+import { setNewPet, getPetsByProperty, updatePet, deletePet, showUserPets, getPropertyFromPet } from '../db.js';
 
 const path = new URL('../../__mocks__/pets.json', import.meta.url);
 
@@ -43,7 +43,31 @@ export default {
 
         await deletePet(pet);
         res.status(200).send({ ok: true });
-    }
+    },
+
+
+
+    async showPets(req,res){
+        const { user } = req.body;
+
+        let TempList = await showUserPets(user);
+        res.status(200).send({ TempList });
+    },
+
+    async searchBy(req,res){
+        const { property, value } = req.body;
+
+        let TempList = await getPetsByProperty(property, value);
+        res.status(200).send({ TempList });
+    },
+
+    async searchPetInfo(req,res){
+        const { property, id } = req.body;
+
+        const response = await getPropertyFromPet(property,id);
+        //console.log(response);
+        res.status(200).send({ response });
+    },
 }
 
 

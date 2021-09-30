@@ -24,7 +24,7 @@ routes.put(
     UsersController.update
 );
 routes.post('/delete-user', 
-    AuthController.validateSession, 
+    //AuthController.validateSession, 
     UsersController.delete
 );
 
@@ -34,5 +34,11 @@ routes.post('/register-pet', PetsController.create);
 routes.put('/update-pet', PetsController.update);
 
 routes.post('/delete-pet', PetsController.delete);
+
+routes.get('/show-user-pets', PetsController.showPets);
+
+routes.get('/search-pets-by', PetsController.searchBy);
+
+routes.get('/search-pet-info', PetsController.searchPetInfo);
 
 export { routes };
