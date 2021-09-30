@@ -53,6 +53,7 @@ pool.getConnection((err, connection) => {
         adoptable varchar(3) not null, 
         adopted varchar (3) not null,
         birthday date,
+        region varchar(255),
         user_id varchar(255) not null,
         constraint fk_user_id foreign key (user_id) references users (id),
         past_owners_id varchar(255)
@@ -180,7 +181,7 @@ export function setNewPet(pet){
         pool.getConnection((err, connection) => {
             if(err) throw err;
             
-            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
+            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.region}', '${pet.user_id}')`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -194,7 +195,7 @@ export function updatePet(pet) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err, rows) => {
+            connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}', '${pet.region}' WHERE id = '${pet.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 
