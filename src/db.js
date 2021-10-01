@@ -32,11 +32,11 @@ pool.getConnection((err, connection) => {
         email varchar(255) not null,
         password varchar(255) not null,
         avatar_url varchar(255) not null,
-        cpf varchar(255) ,
-        cnpj varchar(255) ,
-        cellphone varchar (255) not null,
-        telephone varchar (255) ,
-        cep varchar (255) not null,
+        cpf int,
+        cnpj int,
+        cellphone int not null,
+        telephone int,
+        cep int not null,
         birthday date,
         foundation date
         
@@ -46,14 +46,13 @@ pool.getConnection((err, connection) => {
         id varchar(255) not null primary key,
         avatar_url varchar(255) not null,
         name varchar(255) not null,
-        age varchar(255),
-        sex varchar(255) not null,
+        age tinyint,
+        sex varchar(1) not null,
         breed varchar(255) not null,
         type varchar(255) not null,
-        adoptable varchar(3) not null, 
-        adopted varchar (3) not null,
+        adoptable boolean not null, 
+        adopted boolean not null,
         birthday date,
-        region varchar(255),
         user_id varchar(255) not null,
         constraint fk_user_id foreign key (user_id) references users (id),
         past_owners_id varchar(255)
@@ -63,7 +62,7 @@ pool.getConnection((err, connection) => {
         id varchar(255) not null primary key,
         pet_id varchar(255) not null,
         date DATE not null,
-        description varchar(255) not null,
+        description varchar(4000) not null,
         constraint fk_pet_id foreign key (pet_id) references pets (id)
     );`)
 
@@ -158,14 +157,14 @@ export function updateUser(user) {
     });
 }
 
-export function deleteUser(user) {
+export function deleteUser({ id }) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            connection.query('DELETE FROM pets WHERE user_id = ?', [user.id], (err, rows) =>{
+            connection.query('DELETE FROM pets WHERE user_id = ?', [id] , (err, rows) =>{
                 if (err) reject(err);
             });
-            connection.query('DELETE FROM users WHERE id = ?', [user.id], (err, rows) => {
+            connection.query('DELETE FROM users WHERE id = ?', [id], (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -175,15 +174,12 @@ export function deleteUser(user) {
     });
 }
 
-///*PETS
-// TEM QUE REVER QUAIS VARIAVEIS SERÃO USADAS
-// imagino que a inserção de vacinas e de fotos do pet será feita separada, por isso nao coloquei aqui
 export function setNewPet(pet){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) => {
             if(err) throw err;
 
-            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, region, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.region}', '${pet.user_id}')`, (err,rows) => {
+            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -198,7 +194,7 @@ export function updatePet(pet) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
            
-            connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}', '${pet.region}' WHERE id = '${pet.id}';`, (err, rows) => {
+            connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -208,12 +204,12 @@ export function updatePet(pet) {
     });
 }
 
-export function deletePet(pet) {
+export function deletePet({ id }) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
     
-            connection.query('DELETE FROM pets WHERE id = ?', [pet.id], (err, rows) => {
+            connection.query('DELETE FROM pets WHERE id = ?', [id], (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -223,11 +219,11 @@ export function deletePet(pet) {
     });
 }
 
-export function showUserPets(user){
+export function showUserPets({id}){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) =>{
             if(err) throw err;
-            connection.query(`SELECT * FROM pets WHERE user_id = '${user.id}'`, (err,rows) => {
+            connection.query(`SELECT * FROM pets WHERE user_id = '${id}'`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 

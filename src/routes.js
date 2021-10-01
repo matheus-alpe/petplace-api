@@ -24,21 +24,21 @@ routes.put(
     UsersController.update
 );
 routes.post('/delete-user', 
-    //AuthController.validateSession, 
+    AuthController.validateSession, 
     UsersController.delete
 );
 
 //pets
-routes.post('/register-pet', PetsController.create);
+routes.post('/register-pet', AuthController.validateSession, PetsController.create);
 
-routes.put('/update-pet', PetsController.update);
+routes.put('/update-pet', AuthController.validateSession, PetsController.update);
 
-routes.post('/delete-pet', PetsController.delete);
+routes.post('/delete-pet', AuthController.validateSession, PetsController.delete);
 
-routes.get('/show-user-pets', PetsController.showPets);
+routes.get('/show-user-pets', AuthController.validateSession, PetsController.showPets);
 
-routes.get('/search-pets-by', PetsController.searchBy);
+routes.get('/search-pets-by', AuthController.validateSession, PetsController.searchBy);
 
-routes.get('/search-pet-info', PetsController.searchPetInfo);
+routes.get('/search-pet-info', AuthController.validateSession, PetsController.searchPetInfo);
 
 export { routes };
