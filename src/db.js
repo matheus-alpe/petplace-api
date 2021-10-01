@@ -113,22 +113,41 @@ export function setNewUser(user) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            const { cpf,cnpj } = user;
+            const { cpf,cnpj,telephone } = user;
             if(!cpf && !cnpj) throw err; //verifying if cpf or cnpj were inserted, if they werent error message will popup
             if(!cpf){ //checks which of cpf and cnpj was inserted
-                connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cnpj, cellphone, telephone, cep, foundation) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cnpj}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.foundation}')`, (err, rows) => {
-                    connection.release();
-                    if (err) reject(err);
-                    
-                    resolve(true);
-                });
+                if(telephone) {
+                    connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cnpj, cellphone, telephone, cep, foundation) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cnpj}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.foundation}')`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+                        
+                        resolve(true);
+                    });
+                }else{
+                    connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cnpj, cellphone, cep, foundation) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cnpj}', '${user.cellphone}', '${user.cep}', '${user.foundation}')`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+                        
+                        resolve(true);
+                    });
+                };                    
             }else{
-                connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cpf, cellphone, telephone, cep, birthday) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cpf}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.birthday}')`, (err, rows) => {
-                    connection.release();
-                    if (err) reject(err);
-                    
-                    resolve(true);
-                }); 
+                if(telephone){
+                    connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cpf, cellphone, telephone, cep, birthday) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cpf}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.birthday}')`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+                        
+                        resolve(true);
+                    }); 
+                }else{
+                    connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cpf, cellphone, cep, birthday) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cpf}', '${user.cellphone}', '${user.cep}', '${user.birthday}')`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+                        
+                        resolve(true);
+                    }); 
+                }
+                
             };            
         });
     });
@@ -139,19 +158,39 @@ export function updateUser(user) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
             if(user.cpf){ //checks if user is a institution or normal person
-                connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cpf = '${user.cpf}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
-                    connection.release();
-                    if (err) reject(err);
-
-                    resolve(true);
-                });
+                if(user.telephone){
+                    connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+    
+                        resolve(true);
+                    });
+                }else{
+                    connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cellphone = '${user.cellphone}', cep = '${user.cep}', birthday = '${user.birthday}' WHERE id = '${user.id}';`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+    
+                        resolve(true);
+                    });
+                }
+                
             }else{
-                connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cnpj = '${user.cnpj}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', foundation = '${user.foundation}' WHERE id = '${user.id}';`, (err, rows) => {
-                    connection.release();
-                    if (err) reject(err);
-
-                    resolve(true);
-                });
+                if(user.telephone){
+                    connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cellphone = '${user.cellphone}', telephone = '${user.telephone}', cep = '${user.cep}', foundation = '${user.foundation}' WHERE id = '${user.id}';`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+    
+                        resolve(true);
+                    });
+                }else{
+                    connection.query(`UPDATE users SET name = '${user.name}', email = '${user.email}', password = '${user.password}', avatar_url = '${user.avatar_url}', cellphone = '${user.cellphone}', cep = '${user.cep}', foundation = '${user.foundation}' WHERE id = '${user.id}';`, (err, rows) => {
+                        connection.release();
+                        if (err) reject(err);
+    
+                        resolve(true);
+                    });
+                }
+                
             }
         });
     });

@@ -20,14 +20,16 @@ function validateInputs(user) {
             erros['email'] = 'já cadastrado.';
         }
         
+        tempUser = await getUserByProperty(user.cnpj, 'cnpj')
         if (tempUser && tempUser.cnpj) {
             erros['cnpj'] = 'já cadastrado.';
         }
         
+        tempUser = await getUserByProperty(user.cpf, 'cpf')
         if (tempUser && tempUser.cpf) {
             erros['cpf'] = 'já cadastrado.';
         }
-
+        
         if (erros.email || erros.cpf || erros.cnpj) {
             resolve(erros);
         };
