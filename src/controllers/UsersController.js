@@ -14,8 +14,8 @@ function findUserByProperty(value, property) {
 function validateInputs(user) {
     return new Promise(async function (resolve) {
         let erros = {};
+        
         let tempUser = await getUserByProperty(user.email, 'email')
-
         if (tempUser && tempUser.email) {
             erros['email'] = 'já cadastrado.';
         }

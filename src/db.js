@@ -213,10 +213,29 @@ export function deleteUser({ id }) {
     });
 }
 
+function variablesFixPets(pet){
+    let { age, sex } = pet;
+    
+    let petAge =JSON.stringify(age);
+    petAge = petAge.charAt(1);
+    pet.age=petAge;
+    
+    let petSex =JSON.stringify(sex);
+    petSex = petSex.charAt(1);
+    pet.sex= petSex;
+
+    if(pet.adoptable) pet.adoptable=1;
+    else pet.adoptable=0;
+    if(pet.adopted) pet.adopted=1;
+    else pet.adopted=0; 
+    return (pet);
+}
+
 export function setNewPet(pet){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) => {
             if(err) throw err;
+            pet = variablesFixPets(pet);
 
             connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
                 connection.release();
@@ -232,7 +251,8 @@ export function updatePet(pet) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-           
+            pet = variablesFixPets(pet);
+
             connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err, rows) => {
                 connection.release();
                 if (err) reject(err);

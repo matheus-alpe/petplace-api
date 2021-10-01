@@ -65,7 +65,6 @@ export default {
         const { property, id } = req.body;
 
         const response = await getPropertyFromPet(property,id);
-        //console.log(response);
         res.status(200).send({ response });
     },
 }
