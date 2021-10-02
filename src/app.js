@@ -16,7 +16,7 @@ app.use(express.json());
 app.use('/static', express.static(__dirname + '/pictures'));
 app.use(fileUpload())
 
-app.post('/upload', (req, res) => {
+app.post('/user-upload', (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).send('No files were uploaded.');
     }
