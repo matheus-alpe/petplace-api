@@ -278,7 +278,7 @@ export function deletePet({ id }) {
     });
 }
 
-export function showUserPets({id}){
+export function showUserPets({ id }){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) =>{
             if(err) throw err;
@@ -296,6 +296,10 @@ export function getPetsByProperty(property, value){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection) => {
             if (err) throw err;
+
+            if (value == false) value=0;
+            if (value == true) value=1;
+
             connection.query(`SELECT * FROM pets WHERE ${property} = '${value}'`,(err, rows) => {
                 if(err) reject(err);
                 resolve(rows);
@@ -303,8 +307,7 @@ export function getPetsByProperty(property, value){
         });
     });
 }
-//value esperado para ser a ID do pet
-//pensei em usar para pegar imagens ou vacinas
+
 export function getPropertyFromPet(property, id){
     return new Promise(function(resolve,reject){
         pool.getConnection((err, connection) => {
@@ -319,6 +322,3 @@ export function getPropertyFromPet(property, id){
 }
 
 
-//*/
-
-//
