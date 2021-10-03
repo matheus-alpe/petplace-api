@@ -66,7 +66,7 @@ pool.getConnection((err, connection) => {
         constraint fk_pet_id foreign key (pet_id) references pets (id)
     );`)
 
-    connection.query(`CREATE TABLE IF NOT EXISTS responsabilityTerm (
+    connection.query(`CREATE TABLE IF NOT EXISTS responsibilityTerm (
         id varchar(255) not null primary key,
         donator_id varchar(255) not null,
         adopter_id varchar(255) not null,        
@@ -114,7 +114,7 @@ export function setNewUser(user) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
             const { cpf,cnpj,telephone } = user;
-            if(!cpf && !cnpj) throw err; //verifying if cpf or cnpj were inserted, if they werent error message will popup
+            if(!cpf && !cnpj) throw err; //verifying if cpf or cnpj were inserted, if they were'nt error message will popup
             if(!cpf){ //checks which of cpf and cnpj was inserted
                 if(telephone) {
                     connection.query(`INSERT INTO users (id, name, email, password, avatar_url, cnpj, cellphone, telephone, cep, foundation) VALUES ('${user.id}', '${user.name}', '${user.email}', '${user.password}', '${user.avatar_url}', '${user.cnpj}', '${user.cellphone}', '${user.telephone}', '${user.cep}', '${user.foundation}')`, (err, rows) => {
@@ -321,12 +321,12 @@ export function getPropertyFromPet(property, id){
 
 
 //Donation
-export function createResponsabiltyTerm(responsabilityTerm){
+export function createResponsibilityTerm(responsibilityTerm){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
-            console.log(responsabilityTerm);
-            connection.query(`INSERT INTO responsabilityTerm (id, donator_id, adopter_id, pet_id) VALUES ('${responsabilityTerm.id}', '${responsabilityTerm.donator_id}', '${responsabilityTerm.adopter_id}', '${responsabilityTerm.pet_id}')`,(err, rows) => {
+            console.log(responsibilityTerm);
+            connection.query(`INSERT INTO responsibilityTerm (id, donator_id, adopter_id, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_id}', '${responsibilityTerm.adopter_id}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 

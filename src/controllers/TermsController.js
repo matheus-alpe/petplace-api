@@ -1,27 +1,27 @@
 import { readFileSync, writeFileSync} from 'fs';
-import { createResponsabiltyTerm, getPetsByProperty, getUserByProperty } from '../db.js';
+import { createResponsibilityTerm, getPetsByProperty, getUserByProperty } from '../db.js';
 
 const path = new URL('../../__mocks__/pets.json', import.meta.url);
 
 
-function validateInputs(responsabilityTerm){
+function validateInputs(responsibilityTerm){
     return new Promise(async function(resolve){
         let erros = {};
-        console.log(responsabilityTerm);
-        let tempUser = await getUserByProperty(responsabilityTerm.donator_id, 'id');
+        console.log(responsibilityTerm);
+        let tempUser = await getUserByProperty(responsibilityTerm.donator_id, 'id');
         if (!tempUser) {
             erros['donator_id'] = 'id do doador não existe';
         } 
 
 console.log(erros);
 console.log(tempUser);
-        tempUser = await getUserByProperty(responsabilityTerm.adopter_id, 'id');
+        tempUser = await getUserByProperty(responsibilityTerm.adopter_id, 'id');
         if (!tempUser) {
             erros['adopter_id'] = 'id do adotador não existe';
         }
 
 console.log(tempUser);
-        let tempPet = await getPetsByProperty(responsabilityTerm.pet_id, 'id');
+        let tempPet = await getPetsByProperty(responsibilityTerm.pet_id, 'id');
         if (!tempPet) {
             erros['pet_id'] = 'id do pet não existe';
         }
@@ -35,17 +35,17 @@ console.log(tempPet);
 export default {
     
     async create(req,res){
-        const { responsabilityTerm } = req.body;
+        const { responsibilityTerm } = req.body;
         
-        responsabilityTerm.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
+        responsibilityTerm.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
 
-        const erros = await validateInputs(responsabilityTerm);
+        const erros = await validateInputs(responsibilityTerm);
         console.log(erros);
         if(erros) return res.status(403).send({erros});
 
 
-        await createResponsabiltyTerm(responsabilityTerm);
-        res.status(200).send({ responsabilityTerm });
+        await createResponsibilityTerm(responsibilityTerm);
+        res.status(200).send({ responsibilityTerm });
     },
 
     
