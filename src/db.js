@@ -68,11 +68,9 @@ pool.getConnection((err, connection) => {
 
     connection.query(`CREATE TABLE IF NOT EXISTS responsibilityTerm (
         id varchar(255) not null primary key,
-        donator_id varchar(255) not null,
-        adopter_id varchar(255) not null,        
+        donator_cpf varchar(255) not null,
+        adopter_cpf varchar(255) not null,        
         pet_id varchar(255) not null,
-        constraint fk_donator_id foreign key (donator_id) references users (id),
-        constraint fk_adopter_id foreign key (adopter_id) references users (id),
         constraint fk_pet_idT foreign key (pet_id) references users (id)
     );`)
 })
@@ -326,7 +324,7 @@ export function createResponsibilityTerm(responsibilityTerm){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
             console.log(responsibilityTerm);
-            connection.query(`INSERT INTO responsibilityTerm (id, donator_id, adopter_id, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_id}', '${responsibilityTerm.adopter_id}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
+            connection.query(`INSERT INTO responsibilityTerm (id, donator_cpf, adopter_cpf, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_cpf}', '${responsibilityTerm.adopter_cpf}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 
