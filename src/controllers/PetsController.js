@@ -1,4 +1,3 @@
-import { create } from 'domain';
 import { readFileSync, writeFileSync} from 'fs';
 import { setNewPet, getPetsByProperty, updatePet, deletePet, showUserPets, getPropertyFromPet } from '../db.js';
 

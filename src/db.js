@@ -54,7 +54,7 @@ pool.getConnection((err, connection) => {
         adopted boolean not null,
         birthday date,
         user_id varchar(255) not null,
-        constraint fk_user_id foreign key (user_id) references users (id),
+        constraint fk_user_id foreign key (user_id) references users (id) on delete cascade,
         past_owners_id varchar(255)
     );`)
 
@@ -199,10 +199,7 @@ export function updateUser(user) {
 export function deleteUser({ id }) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
-            if (err) throw err;
-            connection.query('DELETE FROM pets WHERE user_id = ?', [id] , (err, rows) =>{
-                if (err) reject(err);
-            });
+
             connection.query('DELETE FROM users WHERE id = ?', [id], (err, rows) => {
                 connection.release();
                 if (err) reject(err);
@@ -292,7 +289,7 @@ export function showUserPets({ id }){
     });
 }
 
-export function getPetsByProperty(property, value){
+export function getPetsByProperty(value, property){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection) => {
             if (err) throw err;
@@ -322,3 +319,19 @@ export function getPropertyFromPet(property, id){
 }
 
 
+
+//Donation
+export function createResponsabiltyTerm(responsabilityTerm){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection)=> {
+            if(err) throw err;
+            console.log(responsabilityTerm);
+            connection.query(`INSERT INTO responsabilityTerm (id, donator_id, adopter_id, pet_id) VALUES ('${responsabilityTerm.id}', '${responsabilityTerm.donator_id}', '${responsabilityTerm.adopter_id}', '${responsabilityTerm.pet_id}')`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}

@@ -3,6 +3,7 @@ import { Router } from 'express';
 import AuthController from './controllers/AuthController.js';
 import UsersController from './controllers/UsersController.js';
 import PetsController from './controllers/PetsController.js';
+import TermsController from './controllers/TermsController.js';
 
 const routes = Router();
 
@@ -40,5 +41,9 @@ routes.get('/show-user-pets', AuthController.validateSession, PetsController.sho
 routes.get('/search-pets-by', AuthController.validateSession, PetsController.searchBy);
 
 routes.get('/search-pet-info', AuthController.validateSession, PetsController.searchPetInfo);
+
+
+//donation process
+routes.post('/create-term', AuthController.validateSession, TermsController.create);
 
 export { routes };
