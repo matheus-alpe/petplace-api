@@ -72,7 +72,7 @@ pool.getConnection((err, connection) => {
         donator_cpf varchar(255) not null,
         adopter_cpf varchar(255) not null,        
         pet_id varchar(255) not null,
-        constraint fk_pet_idT foreign key (pet_id) references users (id)
+        constraint fk_pet_idT foreign key (pet_id) references pets (id)
     );`)
 })
 
