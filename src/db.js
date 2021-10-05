@@ -92,6 +92,20 @@ export function getUserByProperty(value, property) {
     });
 }
 
+export function getPropertyFromUser(property, id) {
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+            connection.query(`SELECT ${property} FROM users WHERE id = '${id}'`, (err,rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(rows[0]);
+            });
+        });
+    });
+}
+
 export function authenticateUser(email, password) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
@@ -297,7 +311,9 @@ export function getPetsByProperty(value, property){
             if (value == true) value=1;
 
             connection.query(`SELECT * FROM pets WHERE ${property} = '${value}'`,(err, rows) => {
+                connection.release();
                 if(err) reject(err);
+
                 resolve(rows);
             });
         });
@@ -309,6 +325,7 @@ export function getPropertyFromPet(property, id){
         pool.getConnection((err, connection) => {
             if (err) throw err;
             connection.query(`SELECT ${property} FROM pets WHERE id = '${id}'`, (err,rows) => {
+                connection.release();
                 if(err) reject(err);
 
                 resolve(rows[0]);
@@ -324,12 +341,25 @@ export function createResponsibilityTerm(responsibilityTerm){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
-            console.log(responsibilityTerm);
             connection.query(`INSERT INTO responsibilityTerm (id, donator_cpf, adopter_cpf, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_cpf}', '${responsibilityTerm.adopter_cpf}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 
                 resolve(true);
+            });
+        });
+    });
+}
+
+export function checkPetOwner(responsibilityTerm){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection)=> {
+            if(err) throw err;
+            connection.query(`SELECT * FROM pets WHERE id = '${responsibilityTerm.pet_id}' AND user_id = (SELECT id FROM users WHERE cpf = ${responsibilityTerm.donator_cpf})`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(rows[0]);
             });
         });
     });
