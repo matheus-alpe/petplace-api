@@ -241,6 +241,22 @@ function variablesFixPets(pet){
     return (pet);
 }
 
+export function checkIfColumn(value){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection) => {
+            if (err) throw err;
+
+            connection.query(`SELECT DISTINCT column_name FROM information_schema.columns WHERE table_name = N'pets' AND column_name = '${value}'`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(rows[0]);
+            });
+        });
+    });
+}
+
+
 export function setNewPet(pet){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) => {

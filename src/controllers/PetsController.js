@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync} from 'fs';
-import { setNewPet, getPetsByProperty, updatePet, deletePet, showUserPets, getPropertyFromPet } from '../db.js';
+import { setNewPet, getPetsByProperty, updatePet, deletePet, showUserPets, getPropertyFromPet, checkIfColumn } from '../db.js';
 
 const path = new URL('../../__mocks__/pets.json', import.meta.url);
 
@@ -9,6 +9,21 @@ function getPets(){
 
 function findPetByProperty(value, property) {
     return getPets().find((pet) => pet[property] === value);
+}
+
+function validateIfColumn(value){
+    return new Promise(async function(resolve){
+        let erros = {};
+        let tempAux = await checkIfColumn(value);
+        if(!tempAux){
+            erros['coluna_inexistente'] = 'Nome da coluna passada como parâmetro não existe no banco de dados';
+        }
+
+        if(erros.coluna_inexistente){
+            resolve(erros);
+        }
+        resolve();
+    });
 }
 
 export default {
@@ -56,15 +71,28 @@ export default {
     async searchBy(req,res){
         const { property, value } = req.body;
 
-        let TempList = await getPetsByProperty(property, value);
-        res.status(200).send({ TempList });
+        const erros = await validateIfColumn(property);
+        console.log(erros);
+        if (erros){
+            res.status(403).send({ erros });
+        }else{
+            let TempList = await getPetsByProperty(property, value);
+            res.status(200).send({ TempList });
+        }
+        
     },
 
     async searchPetInfo(req,res){
         const { property, id } = req.body;
 
-        const response = await getPropertyFromPet(property,id);
-        res.status(200).send({ response });
+        const erros = await validateIfColumn(property);
+        console.log(erros);
+        if (erros){
+            res.status(403).send({ erros });
+        }else{
+            const response = await getPropertyFromPet(property,id);
+            res.status(200).send({ response });
+        }        
     },
 }
 
