@@ -1,5 +1,5 @@
 import JWT from 'jsonwebtoken';
-import { authenticateUser, getUserByProperty } from '../db.js';
+import { authenticateUser, getPetsByProperty, getUserByProperty } from '../db.js';
 
 const SECRET = 'TEST';
 
@@ -58,23 +58,32 @@ export default {
         const token = req.headers.authorization.split(' ')[1];
 
         JWT.verify(token, SECRET, async (err, decoded) => {
-            if (err) {
-                return res.status(401).send({
+            try {
+                if (err) {
+                    return res.status(401).send({
+                        message: 'Sua sessão é inválida ou está expirada',
+                    });
+                }
+    
+                const tempUser = await getUserByProperty(decoded.id, 'id');
+                if (!tempUser) {
+                    return res.status(401).send({
+                        message: 'Sua sessão é inválida ou está expirada',
+                    });
+                }
+
+                const pets = await getPetsByProperty(tempUser.id, 'user_id') || [];
+
+                res.status(200).send({
+                    token,
+                    user: { ...tempUser },
+                    pets
+                });
+            } catch (error) {
+                res.status(401).send({
                     message: 'Sua sessão é inválida ou está expirada',
                 });
             }
-
-            const tempUser = await getUserByProperty(decoded.id, 'id');
-            if (!tempUser) {
-                return res.status(401).send({
-                    message: 'Sua sessão é inválida ou está expirada',
-                });
-            }
-
-            res.status(200).send({
-                token,
-                user: { ...tempUser },
-            });
         });
     },
 };
