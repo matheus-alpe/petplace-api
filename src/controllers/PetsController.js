@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync} from 'fs';
-import { setNewPet, getPetsByProperty, updatePet, deletePet, showUserPets, getPropertyFromPet, checkIfColumn } from '../db.js';
+import { setNewPet, getPetsByProperty, updatePet, deletePet, showUserPets, getPropertyFromPet, checkIfColumn, getUserByProperty } from '../db.js';
 
 const path = new URL('../../__mocks__/pets.json', import.meta.url);
 
@@ -26,6 +26,21 @@ function validateIfColumn(value){
     });
 }
 
+function validateIDs(value, property){
+    return new Promise(async function(resolve){
+        let erros = {};
+        let userExist = await getUserByProperty(value,property);
+        if(!userExist){
+            erros['user_id_invalida'] = 'id de usuário passada não existe';
+        }
+
+        if(erros.user_id_invalida){
+            resolve(erros);
+        }
+        resolve();
+    });
+}
+
 export default {
     read(req, res){
         const pet=findPetByProperty(req.params.id, 'id');
@@ -34,11 +49,16 @@ export default {
 
     async create(req,res){
         const { pet } = req.body;
-
+        console.log(JSON.stringify(req.headers) +'\n\n\n'+res.status);
         pet.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
-
-        await setNewPet(pet);
-        res.status(200).send({ ok: true });
+        
+        const erros = await validateIDs(pet.user_id,'id');
+        if (erros){
+             res.status(404).send({ erros });
+        }else{
+            await setNewPet(pet);
+            res.status(200).send({ ok: true });
+        };
     },
 
     async update(req,res){
@@ -72,7 +92,6 @@ export default {
         const { property, value } = req.body;
 
         const erros = await validateIfColumn(property);
-        console.log(erros);
         if (erros){
             res.status(403).send({ erros });
         }else{
@@ -86,7 +105,6 @@ export default {
         const { property, id } = req.body;
 
         const erros = await validateIfColumn(property);
-        console.log(erros);
         if (erros){
             res.status(403).send({ erros });
         }else{
