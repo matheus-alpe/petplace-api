@@ -31,10 +31,10 @@ function validateIDs(value, property){
         let erros = {};
         let userExist = await getUserByProperty(value,property);
         if(!userExist){
-            erros['user_id_invalida'] = 'id de usuário passada não existe';
+            erros['user_id'] = 'id de usuário passada não existe';
         }
 
-        if(erros.user_id_invalida){
+        if(erros.user_id){
             resolve(erros);
         }
         resolve();
@@ -48,68 +48,84 @@ export default {
     },
 
     async create(req,res){
-        const { pet } = req.body;
-        console.log(JSON.stringify(req.headers) +'\n\n\n'+res.status);
-        pet.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
-        
-        const erros = await validateIDs(pet.user_id,'id');
-        if (erros){
-             res.status(404).send({ erros });
-        }else{
-            await setNewPet(pet);
-            res.status(200).send({ ok: true });
+        if(res.statusCode == 200){
+            const { pet } = req.body;
+            pet.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
+            
+            const erros = await validateIDs(pet.user_id,'id');
+            if (erros){
+                res.status(404).send({ erros });
+            }else{
+                await setNewPet(pet);
+                res.status(200).send({ ok: true });
+            };
         };
     },
 
     async update(req,res){
-        const { pet } = req.body;
+        if(res.statusCode == 200){
+            const { pet } = req.body;
 
-        if(!pet.id) return res.status(404);
-
-        await updatePet(pet);
-        res.status(200).send({ pet });
+            if(!pet.id) return res.status(404).send({message: "Id do pet não existe ou é incorreta"});
+            else{
+               await updatePet(pet);
+                res.status(200).send({ pet }); 
+            }
+            
+        };        
     },
 
     async delete(req,res) {
-        const { pet } = req.body;
+        if(res.statusCode == 200){
+            const { pet } = req.body;
 
-        if(!pet.id) return res.status(404);
-
-        await deletePet(pet);
-        res.status(200).send({ ok: true });
+            if(!pet.id) return res.status(404).send({message: "Id do pet não existe ou é incorreta"});
+            else{
+                await deletePet(pet);
+                res.status(200).send({ ok: true });
+            }
+            
+        };
     },
 
 
 
     async showPets(req,res){
-        const { user } = req.body;
+        if(res.statusCode == 200){
 
-        let TempList = await showUserPets(user);
-        res.status(200).send({ TempList });
+            const { user } = req.body;
+            let TempList = await showUserPets(user);
+            res.status(200).send({ TempList });
+        }
     },
 
     async searchBy(req,res){
-        const { property, value } = req.body;
+        if(res.statusCode == 200){
 
-        const erros = await validateIfColumn(property);
-        if (erros){
-            res.status(403).send({ erros });
-        }else{
-            let TempList = await getPetsByProperty(property, value);
-            res.status(200).send({ TempList });
+            const { property, value } = req.body;
+
+            const erros = await validateIfColumn(property);
+            if (erros){
+                res.status(403).send({ erros });
+            }else{
+                let TempList = await getPetsByProperty(property, value);
+                res.status(200).send({ TempList });
+            }
         }
-        
     },
 
     async searchPetInfo(req,res){
-        const { property, id } = req.body;
+        if(res.statusCode == 200){
 
-        const erros = await validateIfColumn(property);
-        if (erros){
-            res.status(403).send({ erros });
-        }else{
-            const response = await getPropertyFromPet(property,id);
-            res.status(200).send({ response });
+            const { property, id } = req.body;
+
+            const erros = await validateIfColumn(property);
+            if (erros){
+                res.status(403).send({ erros });
+            }else{
+                const response = await getPropertyFromPet(property,id);
+                res.status(200).send({ response });
+            }   
         }        
     },
 }

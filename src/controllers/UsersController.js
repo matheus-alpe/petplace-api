@@ -61,27 +61,32 @@ export default {
     },
 
     async update(req, res) {
-        const { user } = req.body;
+        if(res.statusCode == 200){
+            const { user } = req.body;
+            
+            if(!user.id) res.status(404).send({message: "Id do usuário não existe ou é incorreta"});
+            else{
+                delete user.iat;
+                delete user.exp;
 
-        if (!user.id) {
-            return res.status(404);
+                await updateUser(user);
+                res.status(200).send({ user });
+            }
         }
-
-        delete user.iat;
-        delete user.exp;
-
-        await updateUser(user);
-        res.status(200).send({ user });
+        
     },
 
     async delete(req, res) {
-        const { user } = req.body;
+        if(res.statusCode == 200){
 
-        if (!user.id) {
-            return res.status(404);
+            const { user } = req.body;
+
+            if (!user.id) {
+                return res.status(404).send({message: "Id do usuário não existe ou é incorreta"});
+            }
+
+            await deleteUser(user);
+            res.status(200).send({ ok: true });
         }
-
-        await deleteUser(user);
-        res.status(200).send({ ok: true });
     }
 };

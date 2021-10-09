@@ -48,16 +48,19 @@ function validateInputs(responsibilityTerm){
 export default {
     
     async create(req,res){
-        const { responsibilityTerm } = req.body;
-        responsibilityTerm.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
+        if(res.statusCode == 200){
 
-        const erros = await validateInputs(responsibilityTerm);
-        if(erros) return res.status(403).send({erros});
+            const { responsibilityTerm } = req.body;
+            responsibilityTerm.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
+
+            const erros = await validateInputs(responsibilityTerm);
+            if(erros) return res.status(403).send({erros});
 
 
-        await createResponsibilityTerm(responsibilityTerm);
-        res.status(200).send({ responsibilityTerm });
-    },
+            await createResponsibilityTerm(responsibilityTerm);
+            res.status(200).send({ responsibilityTerm });
+            }
+        },
 
     
 }
