@@ -225,10 +225,14 @@ export function deleteUser({ id }) {
 
 function variablesFixPets(pet){
     let { age, sex } = pet;
+    if(age){
+        let petAge =JSON.stringify(age);
+        console.log(pet.age)
+        petAge = petAge.charAt(1);
+        pet.age= parseInt(petAge);
+        console.log(pet.age)
+    }
     
-    let petAge =JSON.stringify(age);
-    petAge = petAge.charAt(1);
-    pet.age=petAge;
     
     let petSex =JSON.stringify(sex);
     petSex = petSex.charAt(1);
@@ -262,13 +266,37 @@ export function setNewPet(pet){
         pool.getConnection((err, connection) => {
             if(err) throw err;
             pet = variablesFixPets(pet);
+            if(pet.age && pet.birthday){
+                connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, size, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
 
-            connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, size, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
-                connection.release();
-                if (err) reject(err);
+                    resolve(true);
+                });
+            }
+            if (!pet.age && !pet.birthday){
+                connection.query(`INSERT INTO pets (id, avatar_url, name, sex, breed, type, size, adoptable, adopted, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.user_id}')`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
 
-                resolve(true);
-            });
+                    resolve(true);
+                });
+            }else if(!pet.age){
+                connection.query(`INSERT INTO pets (id, avatar_url, name, sex, breed, type, size, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(true);
+                });
+            }else{
+                connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, size, adoptable, adopted, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.user_id}')`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(true);
+                });
+            }   
+            
         });
     });
 }
@@ -279,12 +307,36 @@ export function updatePet(pet) {
             if (err) throw err;
             pet = variablesFixPets(pet);
 
-            connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', size = '${pet.size}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err, rows) => {
-                connection.release();
-                if (err) reject(err);
+            if(pet.age && pet.birthday){
+                connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', size = '${pet.size}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
 
-                resolve(true);
-            });
+                    resolve(true);
+                });
+            }
+            if (!pet.age && !pet.birthday){
+                connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', size = '${pet.size}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}' WHERE id = '${pet.id}';`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(true);
+                });
+            }else if(!pet.age){
+                connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', size = '${pet.size}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}', birthday = '${pet.birthday}' WHERE id = '${pet.id}';`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(true);
+                });
+            }else{
+                connection.query(`UPDATE pets SET avatar_url='${pet.avatar_url}', name = '${pet.name}', age = '${pet.age}', sex = '${pet.sex}', breed = '${pet.breed}', type = '${pet.type}', size = '${pet.size}', adoptable = '${pet.adoptable}', adopted = '${pet.adopted}' WHERE id = '${pet.id}';`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(true);
+                });
+            }
         });
     });
 }
@@ -376,6 +428,23 @@ export function checkPetOwner(responsibilityTerm){
                 if(err) reject(err);
 
                 resolve(rows[0]);
+            });
+        });
+    });
+}
+
+export function changeOwners(pet_id, adopter, donator){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection)=> {
+            if(err) throw err;
+            
+            //console.log(responsibilityTerm);
+            //console.log(tempUsers);
+            connection.query(`UPDATE pets SET user_id='${adopter.id}', past_owners_id = '${donator.id}' WHERE id = '${pet_id}'`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
             });
         });
     });

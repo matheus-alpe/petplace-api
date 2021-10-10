@@ -46,4 +46,6 @@ routes.get('/search-pet-info', AuthController.validateSession, PetsController.se
 //donation process
 routes.post('/create-term', AuthController.validateSession, TermsController.create);
 
+routes.put('/change-owners', AuthController.validateSession, TermsController.exchange);
+
 export { routes };
