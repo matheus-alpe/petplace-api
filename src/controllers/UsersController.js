@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from 'fs';
+import { resolve } from 'path';
 import { deleteUser, getUserByProperty, setNewUser, updateUser } from '../db.js'
 
 const path = new URL('../../__mocks__/users.json', import.meta.url);
@@ -37,6 +38,19 @@ function validateInputs(user) {
     });
 }
 
+function validateID({id}){
+    return new Promise(async function (resolve) {
+        let erros = {};
+        
+        let tempUser = getUserByProperty (id,'id');
+        if(!tempUser || !id) {
+            erros['id'] = 'User id não existe ou é inválida';
+            resolve(erros);
+        }
+        resolve();
+    });
+}
+
 export default {
     read(req, res) {
         const user = findUserByProperty(req.params.id, 'id');
@@ -63,8 +77,9 @@ export default {
     async update(req, res) {
         if(res.statusCode == 200){
             const { user } = req.body;
-            
-            if(!user.id) res.status(404).send({message: "Id do usuário não existe ou é incorreta"});
+
+            const erros = await validateID(user);
+            if(erros) res.status(404).send({erros});
             else{
                 delete user.iat;
                 delete user.exp;
@@ -78,15 +93,16 @@ export default {
 
     async delete(req, res) {
         if(res.statusCode == 200){
-
             const { user } = req.body;
 
-            if (!user.id) {
-                return res.status(404).send({message: "Id do usuário não existe ou é incorreta"});
+            const erros = await validateID(user);
+            if(erros) res.status(404).send({erros});
+            else{
+                await deleteUser(user);
+                res.status(200).send({ ok: true });
             }
 
-            await deleteUser(user);
-            res.status(200).send({ ok: true });
+            
         }
     }
 };
