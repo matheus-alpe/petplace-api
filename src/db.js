@@ -273,30 +273,32 @@ export function setNewPet(pet){
 
                     resolve(true);
                 });
-            }
-            if (!pet.age && !pet.birthday){
+                return
+            } else if (!pet.age && !pet.birthday){
                 connection.query(`INSERT INTO pets (id, avatar_url, name, sex, breed, type, size, adoptable, adopted, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.user_id}')`, (err,rows) => {
                     connection.release();
                     if (err) reject(err);
 
                     resolve(true);
                 });
-            }else if(!pet.age){
+                return
+            } else if (!pet.age){
                 connection.query(`INSERT INTO pets (id, avatar_url, name, sex, breed, type, size, adoptable, adopted, birthday, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.birthday}', '${pet.user_id}')`, (err,rows) => {
                     connection.release();
                     if (err) reject(err);
 
                     resolve(true);
                 });
-            }else{
+                return
+            } else {
                 connection.query(`INSERT INTO pets (id, avatar_url, name, age, sex, breed, type, size, adoptable, adopted, user_id) VALUES ('${pet.id}', '${pet.avatar_url}', '${pet.name}', '${pet.age}', '${pet.sex}', '${pet.breed}', '${pet.type}', '${pet.size}', '${pet.adoptable}', '${pet.adopted}', '${pet.user_id}')`, (err,rows) => {
                     connection.release();
                     if (err) reject(err);
 
                     resolve(true);
                 });
+                return
             }   
-            
         });
     });
 }
