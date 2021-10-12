@@ -76,7 +76,6 @@ export default {
     async exchange(req,res){
         if(res.statusCode == 200){
             const { responsibilityTerm } = req.body;
-            responsibilityTerm.id = new Date().toISOString().replace(/[^\w\s]/gi, '');
 
             const erros = await validateInputs(responsibilityTerm);
             if(erros) return res.status(403).send({erros});
