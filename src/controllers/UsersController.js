@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from 'fs';
-import { resolve } from 'path';
 import { deleteUser, getUserByProperty, setNewUser, updateUser } from '../db.js'
 
 const path = new URL('../../__mocks__/users.json', import.meta.url);

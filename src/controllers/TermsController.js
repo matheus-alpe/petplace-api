@@ -20,12 +20,14 @@ function validateInputs(responsibilityTerm){
         let tempPet = await getPetsByProperty(responsibilityTerm.pet_id, 'id');
         if (!tempPet) {
             erros['pet_id'] = 'id do pet não existe';
+        }else{
+            tempUser = await checkPetOwner(responsibilityTerm);
+            if(!tempUser){
+                erros['wrong_owner'] = 'pet não pertence ao dono de cpf passado';
+            }
         }
 
-        tempUser = await checkPetOwner(responsibilityTerm);
-        if(!tempUser){
-            erros['wrong_owner'] = 'pet não pertence ao dono de cpf passado';
-        }
+        
 
         if (erros.donator_cpf || erros.adopter_cpf || erros.pet_id || erros.wrong_owner){
             resolve(erros);

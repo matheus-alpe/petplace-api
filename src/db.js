@@ -72,7 +72,7 @@ pool.getConnection((err, connection) => {
         donator_cpf varchar(255) not null,
         adopter_cpf varchar(255) not null,        
         pet_id varchar(255) not null,
-        constraint fk_pet_idT foreign key (pet_id) references pets (id)
+        constraint fk_pet_idT foreign key (pet_id) references pets (id) ON DELETE CASCADE
     );`)
 })
 
@@ -379,12 +379,13 @@ export function getPetsByProperty(value, property){
 
             if (value == false) value=0;
             if (value == true) value=1;
-
+            console.log(value);
+            console.log(property);
             connection.query(`SELECT * FROM pets WHERE ${property} = '${value}'`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 
-                resolve(rows);
+                resolve(rows && rows[0]);
             });
         });
     });
@@ -443,6 +444,82 @@ export function changeOwners(pet_id, adopter, donator){
             //console.log(responsibilityTerm);
             //console.log(tempUsers);
             connection.query(`UPDATE pets SET user_id='${adopter.id}', past_owners_id = '${donator.id}' WHERE id = '${pet_id}'`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+
+// veterinary history
+export function createVetHistory(vetHistory){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection)=> {
+            if(err) throw err;
+            connection.query(`INSERT INTO vetHistory (id, pet_id, date, description) VALUES ('${vetHistory.id}', '${vetHistory.pet_id}', '${vetHistory.date}', '${vetHistory.description}')`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+export function updateVetHistory(vetHistory) { 
+    return new Promise(function (resolve, reject) {
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+            console.log(vetHistory);
+            connection.query(`UPDATE vetHistory SET description='${vetHistory.description}' WHERE id = '${vetHistory.id}';`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+            
+        });
+    });
+}
+
+export function getVetHistoryByProperty(value, property){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection) => {
+            if (err) throw err;
+            
+            connection.query(`SELECT * FROM vetHistory WHERE ${property} = '${value}'`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(rows[0]);
+            });
+        });
+    });
+}
+
+export function showPetVetHistory({id}){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) =>{
+            if(err) throw err;
+            connection.query(`SELECT * FROM vetHistory WHERE pet_id = '${id}'`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(rows);
+            });
+        });
+    });
+}
+
+export function deleteVetHistory({id}){
+    return new Promise(function (resolve, reject) {
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+    
+            connection.query('DELETE FROM vetHistory WHERE id = ?', [id], (err, rows) => {
                 connection.release();
                 if (err) reject(err);
 

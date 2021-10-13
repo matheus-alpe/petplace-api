@@ -108,7 +108,7 @@ export default {
             if (erros){
                 res.status(403).send({ erros });
             }else{
-                let TempList = await getPetsByProperty(property, value);
+                let TempList = await getPetsByProperty(value, property);
                 res.status(200).send({ TempList });
             }
         }

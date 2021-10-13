@@ -4,6 +4,7 @@ import AuthController from './controllers/AuthController.js';
 import UsersController from './controllers/UsersController.js';
 import PetsController from './controllers/PetsController.js';
 import TermsController from './controllers/TermsController.js';
+import VetController from './controllers/VetController.js';
 
 const routes = Router();
 
@@ -47,5 +48,14 @@ routes.get('/search-pet-info', AuthController.validateSession, PetsController.se
 routes.post('/create-term', AuthController.validateSession, TermsController.create);
 
 routes.put('/change-owners', AuthController.validateSession, TermsController.exchange);
+
+//veterinary history
+routes.post('/create-vetHistory', AuthController.validateSession, VetController.create);
+
+routes.put('/update-vetHistory', AuthController.validateSession, VetController.update);
+
+routes.post('/delete-vetHistory', AuthController.validateSession, VetController.delete);
+
+routes.get('/show-pet-vetHistory', AuthController.validateSession, VetController.showAllFromPet);
 
 export { routes };
