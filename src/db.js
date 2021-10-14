@@ -227,10 +227,8 @@ function variablesFixPets(pet){
     let { age, sex } = pet;
     if(age){
         let petAge =JSON.stringify(age);
-        console.log(pet.age)
         petAge = petAge.charAt(1);
         pet.age= parseInt(petAge);
-        console.log(pet.age)
     }
     
     
@@ -379,8 +377,7 @@ export function getPetsByProperty(value, property){
 
             if (value == false) value=0;
             if (value == true) value=1;
-            console.log(value);
-            console.log(property);
+            
             connection.query(`SELECT * FROM pets WHERE ${property} = '${value}'`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
@@ -473,7 +470,6 @@ export function updateVetHistory(vetHistory) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            console.log(vetHistory);
             connection.query(`UPDATE vetHistory SET description='${vetHistory.description}' WHERE id = '${vetHistory.id}';`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
@@ -500,11 +496,11 @@ export function getVetHistoryByProperty(value, property){
     });
 }
 
-export function showPetVetHistory({id}){
+export function showPetVetHistory(value){
     return new Promise(function(resolve, reject){
         pool.getConnection((err, connection) =>{
             if(err) throw err;
-            connection.query(`SELECT * FROM vetHistory WHERE pet_id = '${id}'`, (err,rows) => {
+            connection.query(`SELECT * FROM vetHistory WHERE pet_id = '${value.id}'`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
@@ -524,6 +520,61 @@ export function deleteVetHistory({id}){
                 if (err) reject(err);
 
                 resolve(true);
+            });
+        });
+    });
+}
+
+
+export function showAllUserInfo(user){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) =>{
+            if(err) throw err;
+            if(user.cpf){
+                connection.query(`SELECT users.id as user_id , users.name as user_name, users.email, users.password, users.avatar_url as user_avatar, users.cpf, users.cellphone, users.telephone, users.cep, users.birthday as user_birthday, pets.id as pet_id, pets.avatar_url as pet_avatar, pets.name as pet_name, pets.age, pets.sex, pets.breed, pets.type, pets.size, pets.adoptable, pets.adopted, pets.birthday as pet_birthday, vethistory.id as vethistory_id, vethistory.date, vethistory.description from pets inner join vethistory on pets.id=vethistory.pet_id inner join users on pets.user_id= users.id where users.id = '${user.id}';`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(rows);
+                });
+            }else{
+                connection.query(`SELECT users.id as user_id , users.name as user_name, users.email, users.password, users.avatar_url as user_avatar, users.cnpj, users.cellphone, users.telephone, users.cep, users.foundation as user_foundation, pets.id as pet_id, pets.avatar_url as pet_avatar, pets.name as pet_name, pets.age, pets.sex, pets.breed, pets.type, pets.size, pets.adoptable, pets.adopted, pets.birthday as pet_birthday, vethistory.id as vethistory_id, vethistory.date, vethistory.description from pets inner join vethistory on pets.id=vethistory.pet_id inner join users on pets.user_id= users.id where users.id = '${user.id}';`, (err,rows) => {
+                    connection.release();
+                    if (err) reject(err);
+
+                    resolve(rows);
+                });
+            }
+            
+        });
+    });
+}
+
+export function showAllPetsFromUser(user){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) =>{
+            if(err) throw err;
+            connection.query(`SELECT pets.id, pets.avatar_url, pets.name, pets.age, pets.sex, pets.breed, pets.type, pets.size, pets.adoptable, pets.adopted, pets.birthday as pet_birthday, vethistory.id as vethistory_id, vethistory.date, vethistory.description from pets inner join vethistory on pets.id=vethistory.pet_id inner join users on pets.user_id= users.id where users.id = '${user.id}';`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(rows);
+            });
+            
+        });
+    });
+}
+
+export function showAllVetHistoryFromUserPets(user){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) =>{
+            if(err) throw err;
+
+            connection.query(`SELECT vethistory.pet_id, vethistory.id as vethistory_id, vethistory.date, vethistory.description from pets inner join vethistory on pets.id=vethistory.pet_id inner join users on pets.user_id= users.id where users.id = '${user.id}';`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(rows);
             });
         });
     });

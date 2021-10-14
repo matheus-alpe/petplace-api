@@ -1,5 +1,5 @@
 import JWT from 'jsonwebtoken';
-import { authenticateUser, getUserByProperty, showPetVetHistory, showUserPets } from '../db.js';
+import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets } from '../db.js';
 
 const SECRET = 'TEST';
 
@@ -73,7 +73,10 @@ export default {
                 }
 
                 const pets = await showUserPets(tempUser) || [];
-                const vetHistory = await showPetVetHistory(pets) || [];
+                console.log(pets);
+                
+                const vetHistory = await showAllVetHistoryFromUserPets(decoded) || [];
+                console.log(vetHistory);
 
                 res.status(200).send({
                     token,
@@ -82,6 +85,7 @@ export default {
                     vetHistory
                 });
             } catch (error) {
+                console.log(error);
                 res.status(401).send({
                     message: 'Sua sessão é inválida ou está expirada',
                 });
