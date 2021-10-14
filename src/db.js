@@ -64,7 +64,7 @@ pool.getConnection((err, connection) => {
         pet_id varchar(255) not null,
         date DATE not null,
         description varchar(4000) not null,
-        constraint fk_pet_id foreign key (pet_id) references pets (id)
+        constraint fk_pet_id foreign key (pet_id) references pets (id) ON DELETE CASCADE
     );`)
 
     connection.query(`CREATE TABLE IF NOT EXISTS responsibilityTerm (
