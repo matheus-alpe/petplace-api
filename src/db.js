@@ -437,9 +437,7 @@ export function changeOwners(pet_id, adopter, donator){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
-            
-            //console.log(responsibilityTerm);
-            //console.log(tempUsers);
+
             connection.query(`UPDATE pets SET user_id='${adopter.id}', past_owners_id = '${donator.id}' WHERE id = '${pet_id}'`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);

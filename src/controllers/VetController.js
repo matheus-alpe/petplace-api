@@ -88,8 +88,8 @@ export default {
             const erros = await validateInputs(pet);
             if(erros) return res.status(403).send({erros});
 
-            let tempList = await showPetVetHistory(pet);
-            res.status(200).send({ tempList });
+            let vetHistory = await showPetVetHistory(pet);
+            res.status(200).send({ vetHistory });
         }
     }
     

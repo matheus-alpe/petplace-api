@@ -94,8 +94,8 @@ export default {
         if(res.statusCode == 200){
 
             const { user } = req.body;
-            let TempList = await showUserPets(user);
-            res.status(200).send({ TempList });
+            let pets = await showUserPets(user);
+            res.status(200).send({ pets });
         }
     },
 
@@ -108,8 +108,8 @@ export default {
             if (erros){
                 res.status(403).send({ erros });
             }else{
-                let TempList = await getPetsByProperty(value, property);
-                res.status(200).send({ TempList });
+                let pets = await getPetsByProperty(value, property);
+                res.status(200).send({ pets });
             }
         }
     },

@@ -73,10 +73,8 @@ export default {
                 }
 
                 const pets = await showUserPets(tempUser) || [];
-                console.log(pets);
                 
                 const vetHistory = await showAllVetHistoryFromUserPets(decoded) || [];
-                console.log(vetHistory);
 
                 res.status(200).send({
                     token,
@@ -85,7 +83,6 @@ export default {
                     vetHistory
                 });
             } catch (error) {
-                console.log(error);
                 res.status(401).send({
                     message: 'Sua sessão é inválida ou está expirada',
                 });
