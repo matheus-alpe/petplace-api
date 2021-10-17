@@ -57,7 +57,7 @@ export default {
                 res.status(404).send({ erros });
             }else{
                 await setNewPet(pet);
-                res.status(200).send({ ok: true });
+                res.status(200).send({ pet });
             };
         };
     },
