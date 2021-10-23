@@ -26,11 +26,11 @@ routes.put('/update-pet', AuthController.validateSession, PetsController.update)
 
 routes.post('/delete-pet', AuthController.validateSession, PetsController.delete);
 
-routes.get('/show-user-pets', AuthController.validateSession, PetsController.showPets);
+routes.post('/show-user-pets', AuthController.validateSession, PetsController.showPets);
 
-routes.get('/search-pets-by', AuthController.validateSession, PetsController.searchBy);
+routes.post('/search-pets-by', AuthController.validateSession, PetsController.searchBy);
 
-routes.get('/search-pet-info', AuthController.validateSession, PetsController.searchPetInfo);
+routes.post('/search-pet-info', AuthController.validateSession, PetsController.searchPetInfo);
 
 
 //donation process
