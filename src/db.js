@@ -16,7 +16,8 @@ import mysql from 'mysql';
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'Melves',
+    user: process.env.BD_USER,
+    password: process.env.BD_PASS,
     database: 'petplace'
 });
 
@@ -382,7 +383,7 @@ export function getPetsByProperty(value, property){
                 connection.release();
                 if(err) reject(err);
 
-                resolve(rows && rows[0]);
+                resolve(rows && rows);
             });
         });
     });
@@ -468,7 +469,7 @@ export function updateVetHistory(vetHistory) {
     return new Promise(function (resolve, reject) {
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            connection.query(`UPDATE vetHistory SET description='${vetHistory.description}' WHERE id = '${vetHistory.id}';`, (err,rows) => {
+            connection.query(`UPDATE vetHistory SET description='${vetHistory.description}', date='${vetHistory.date}' WHERE id = '${vetHistory.id}';`, (err,rows) => {
                 connection.release();
                 if (err) reject(err);
 
