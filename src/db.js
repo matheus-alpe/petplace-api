@@ -32,11 +32,11 @@ pool.getConnection((err, connection) => {
         email varchar(255) not null,
         password varchar(255) not null,
         avatar_url varchar(255) not null,
-        cpf int,
-        cnpj int,
-        cellphone int not null,
-        telephone int,
-        cep int not null,
+        cpf varchar(255),
+        cnpj varchar(255),
+        cellphone varchar(255) not null,
+        telephone varchar(255),
+        cep varchar(255) not null,
         birthday date,
         foundation date
         
