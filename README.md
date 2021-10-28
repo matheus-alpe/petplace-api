@@ -40,3 +40,23 @@
 ######
 
 - `/search-pet-info` -- verifica se o token de sessão passado como parâmetro é válido e então mostra a property passada como parâmetro do pet de id passada por parâmetro, sendo que property = alguma coluna da tabela de pets
+
+###### Donation Process
+
+- `/create-term` -- verifica se o token de sessão passado como parâmetro é válido e então faz a inserção de um responsibilityTerm body, id não é necessário, cpf do doador e do adotador, assim como id do pet são necessários
+######
+
+- `/change-owners` -- verifica se o token de sessão passado como parâmetro é válido e então faz a troca do dono de um pet, cpf do doador e do adotador são necessários, assim como id do pet
+
+###### Veterinary History
+
+- `/create-vetHistory` -- verifica se o token de sessão passado como parâmetro é válido e então faz a inserção de um vetHistory body, id não é necessário, descricao e pet id são necessários
+######
+
+- `/update-vetHistory` -- verifica se o token de sessão passado como parâmetro é válido e então faz o update dos dados de um vetHistory passado como parâmetro
+######
+
+- `/delete-vetHistory` -- verifica se o token de sessão passado como parâmetro é válido e então faz a exclusão de um vetHistory, através do id de vetHistory passado como parâmetro
+######
+
+- `/show-pet-vetHistory` -- verifica se o token de sessão passado como parâmetro é válido e então mostra todo histórico veterinário de um pet através de uma pet id passada como parâmetro
