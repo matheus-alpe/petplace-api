@@ -45,6 +45,6 @@ routes.put('/update-vetHistory', AuthController.validateSession, VetController.u
 
 routes.post('/delete-vetHistory', AuthController.validateSession, VetController.delete);
 
-routes.get('/show-pet-vetHistory', AuthController.validateSession, VetController.showAllFromPet);
+routes.post('/show-pet-vetHistory', AuthController.validateSession, VetController.showAllFromPet);
 
 export { routes };
