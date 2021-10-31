@@ -16,8 +16,7 @@ import mysql from 'mysql';
 const pool = mysql.createPool({
     host: 'localhost',
     user: 'root',
-    user: process.env.BD_USER,
-    password: process.env.BD_PASS,
+    password: 'Melves',
     database: 'petplace'
 });
 
@@ -70,8 +69,8 @@ pool.getConnection((err, connection) => {
 
     connection.query(`CREATE TABLE IF NOT EXISTS responsibilityTerm (
         id varchar(255) not null primary key,
-        donator_cpf varchar(255) not null,
-        adopter_cpf varchar(255) not null,        
+        donator_identifier varchar(255) not null,
+        adopter_identifier varchar(255) not null,        
         pet_id varchar(255) not null,
         constraint fk_pet_idT foreign key (pet_id) references pets (id) ON DELETE CASCADE
     );`)
@@ -410,7 +409,7 @@ export function createResponsibilityTerm(responsibilityTerm){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
-            connection.query(`INSERT INTO responsibilityTerm (id, donator_cpf, adopter_cpf, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_cpf}', '${responsibilityTerm.adopter_cpf}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
+            connection.query(`INSERT INTO responsibilityTerm (id, donator_identifier, adopter_identifier, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_identifier}', '${responsibilityTerm.adopter_identifier}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 
@@ -424,7 +423,7 @@ export function checkPetOwner(responsibilityTerm){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
-            connection.query(`SELECT * FROM pets WHERE id = '${responsibilityTerm.pet_id}' AND user_id = (SELECT id FROM users WHERE cpf = ${responsibilityTerm.donator_cpf})`,(err, rows) => {
+            connection.query(`SELECT * FROM pets WHERE id = '${responsibilityTerm.pet_id}' AND user_id = (SELECT id FROM users WHERE cpf = ${responsibilityTerm.donator_identifier} or cnpj = ${responsibilityTerm.donator_identifier})`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 

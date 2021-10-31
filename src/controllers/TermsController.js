@@ -7,14 +7,16 @@ const path = new URL('../../__mocks__/pets.json', import.meta.url);
 function validateInputs(responsibilityTerm){
     return new Promise(async function(resolve){
         let erros = {};
-        let tempUser = await getUserByProperty(responsibilityTerm.donator_cpf, 'cpf');
+        let tempUser = await getUserByProperty(responsibilityTerm.donator_identifier, 'cpf');
+        if (!tempUser) tempUser = await getUserByProperty(responsibilityTerm.donator_identifier, 'cnpj');
         if (!tempUser) {
-            erros['donator_cpf'] = 'cpf do doador não existe';
+            erros['donator_identifier'] = 'cpf ou cnpj do doador não existe';
         } 
 
-        tempUser = await getUserByProperty(responsibilityTerm.adopter_cpf, 'cpf');
+        tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cpf');
+        if (!tempUser) tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cnpj');
         if (!tempUser) {
-            erros['adopter_cpf'] = 'cpf do adotador não existe';
+            erros['adopter_identifier'] = 'cpf ou cnpj do adotador não existe';
         }
 
         let tempPet = await getPetsByProperty(responsibilityTerm.pet_id, 'id');
@@ -23,13 +25,13 @@ function validateInputs(responsibilityTerm){
         }else{
             tempUser = await checkPetOwner(responsibilityTerm);
             if(!tempUser){
-                erros['wrong_owner'] = 'pet não pertence ao dono de cpf passado';
+                erros['wrong_owner'] = 'pet não pertence ao dono de cpf ou cnpj passado';
             }
         }
 
         
 
-        if (erros.donator_cpf || erros.adopter_cpf || erros.pet_id || erros.wrong_owner){
+        if (erros.donator_identifier || erros.adopter_identifier || erros.pet_id || erros.wrong_owner){
             resolve(erros);
         }else{
             //transforming JSON to string and getting cpf from pet owner then comparing to adopter_cpf
@@ -37,10 +39,18 @@ function validateInputs(responsibilityTerm){
             tempPet = JSON.stringify(tempPet);
             tempPet = tempPet.substring(12, tempPet.length-2 );
             tempUser = await getPropertyFromUser('cpf', tempPet);
-            tempUser = JSON.stringify(tempUser);
-            tempUser = tempUser.substring(7, tempUser.length-1 );
-            if( tempUser == responsibilityTerm.adopter_cpf){
-                erros['owner_is_adopter'] = 'pet pertence ao usuário do cpf que quer adotar';
+            if(!tempUser.cpf) {
+                tempUser = await getPropertyFromUser('cnpj', tempPet);
+                tempUser = JSON.stringify(tempUser);
+                tempUser = tempUser.substring(8, tempUser.length-1 );
+            }else{
+                tempUser = JSON.stringify(tempUser);
+                tempUser = tempUser.substring(7, tempUser.length-1 );
+            }
+            
+            //console.log(tempUser);
+            if( tempUser == responsibilityTerm.adopter_identifier){
+                erros['owner_is_adopter'] = 'pet pertence ao usuário do cpf ou cnpj que quer adotar';
             }
             if(erros.owner_is_adopter) resolve(erros);
         }
@@ -50,9 +60,10 @@ function validateInputs(responsibilityTerm){
     });
 }
 
-function cpfToID(value){
+function identifierToID(value){
     return new Promise(async function(resolve){
         let tempUser = await getUserByProperty(value,'cpf');
+        if(!tempUser) tempUser = await getUserByProperty(value, 'cnpj');
 
         resolve(tempUser);
     });
@@ -82,8 +93,8 @@ export default {
             const erros = await validateInputs(responsibilityTerm);
             if(erros) return res.status(403).send({erros});
 
-            let adopter = await cpfToID(responsibilityTerm.adopter_cpf); 
-            let donator = await cpfToID(responsibilityTerm.donator_cpf);
+            let adopter = await identifierToID(responsibilityTerm.adopter_identifier); 
+            let donator = await identifierToID(responsibilityTerm.donator_identifier);
 
             await changeOwners(responsibilityTerm.pet_id, adopter, donator);
             res.status(200).send({ ok: true });
