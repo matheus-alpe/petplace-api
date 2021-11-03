@@ -74,6 +74,14 @@ function validateUpdate(responsibilityTerm){
         
         if( responsibilityTerm.donator_identifier == responsibilityTerm.adopter_identifier) erros['owner_is_adopter'] = 'pet pertence ao usuário do cpf ou cnpj que quer adotar';
         
+        if (responsibilityTerm.adopter_identifier){
+            let tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cpf');
+            if (!tempUser) tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cnpj');
+            if (!tempUser) {
+                erros['adopter_identifier'] = 'cpf ou cnpj do adotador não existe';
+            }
+        }
+
         if(erros.id || erros.status_undefined || erros.owner_is_adopter) resolve(erros);
         
         
