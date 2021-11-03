@@ -46,7 +46,12 @@
 - `/create-term` -- verifica se o token de sessão passado como parâmetro é válido e então faz a inserção de um responsibilityTerm body, id não é necessário, cpf do doador e do adotador, assim como id do pet são necessários
 ######
 
-- `/change-owners` -- verifica se o token de sessão passado como parâmetro é válido e então faz a troca do dono de um pet, cpf do doador e do adotador são necessários, assim como id do pet
+- `/update-owners` -- verifica se o token de sessão passado como parâmetro é válido e então faz a troca do dono de um pet, cpf do doador e do adotador são necessários, assim como id do pet
+######
+
+- `/update-term` -- verifica se o token de sessão passado como parâmetro é válido e então faz o update dos dados de um termo de responsabilidade que foi passado como parâmetro, através de sua id 
+> são esperados id, donator_identifier, adopter_identifier, pet_id e status dentro do objeto passado como parâmetro 
+#
 
 ###### Veterinary History
 
