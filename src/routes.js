@@ -36,7 +36,9 @@ routes.post('/search-pet-info', AuthController.validateSession, PetsController.s
 //donation process
 routes.post('/create-term', AuthController.validateSession, TermsController.create);
 
-routes.put('/change-owners', AuthController.validateSession, TermsController.exchange);
+routes.put('/update-owners', AuthController.validateSession, TermsController.exchange);
+
+routes.put('/update-term', AuthController.validateSession, TermsController.update);
 
 //veterinary history
 routes.post('/create-vetHistory', AuthController.validateSession, VetController.create);

@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync} from 'fs';
-import { changeOwners, checkPetOwner, createResponsibilityTerm, getPetsByProperty, getPropertyFromPet, getPropertyFromUser, getUserByProperty } from '../db.js';
+import { changeOwners, checkPetOwner, checkTermID, createResponsibilityTerm, getPetsByProperty, getPropertyFromPet, getPropertyFromUser, getUserByProperty, updateResponsibilityTerm } from '../db.js';
 
 const path = new URL('../../__mocks__/pets.json', import.meta.url);
 
@@ -12,12 +12,16 @@ function validateInputs(responsibilityTerm){
         if (!tempUser) {
             erros['donator_identifier'] = 'cpf ou cnpj do doador não existe';
         } 
+        
 
-        tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cpf');
-        if (!tempUser) tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cnpj');
-        if (!tempUser) {
-            erros['adopter_identifier'] = 'cpf ou cnpj do adotador não existe';
+        if (responsibilityTerm.adopter_identifier){
+            tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cpf');
+            if (!tempUser) tempUser = await getUserByProperty(responsibilityTerm.adopter_identifier, 'cnpj');
+            if (!tempUser) {
+                erros['adopter_identifier'] = 'cpf ou cnpj do adotador não existe';
+            }
         }
+        
 
         let tempPet = await getPetsByProperty(responsibilityTerm.pet_id, 'id');
         if (!tempPet) {
@@ -29,7 +33,7 @@ function validateInputs(responsibilityTerm){
             }
         }
 
-        
+        if(!responsibilityTerm.status) erros['status_undefined'] = 'o status do termo não foi definido';
 
         if (erros.donator_identifier || erros.adopter_identifier || erros.pet_id || erros.wrong_owner){
             resolve(erros);
@@ -48,7 +52,6 @@ function validateInputs(responsibilityTerm){
                 tempUser = tempUser.substring(7, tempUser.length-1 );
             }
             
-            //console.log(tempUser);
             if( tempUser == responsibilityTerm.adopter_identifier){
                 erros['owner_is_adopter'] = 'pet pertence ao usuário do cpf ou cnpj que quer adotar';
             }
@@ -56,6 +59,24 @@ function validateInputs(responsibilityTerm){
         }
         
 
+        resolve();
+    });
+}
+
+function validateUpdate(responsibilityTerm){
+    return new Promise(async function(resolve){
+        let erros = {};
+        
+        let tempTerm = await checkTermID(responsibilityTerm.id);
+        if (!tempTerm) erros['id'] = 'id do termo de responsabilidade não existe';
+        
+        if(!responsibilityTerm.status) erros['status_undefined'] = 'o status do termo não foi definido';
+        
+        if( responsibilityTerm.donator_identifier == responsibilityTerm.adopter_identifier) erros['owner_is_adopter'] = 'pet pertence ao usuário do cpf ou cnpj que quer adotar';
+        
+        if(erros.id || erros.status_undefined || erros.owner_is_adopter) resolve(erros);
+        
+        
         resolve();
     });
 }
@@ -99,6 +120,18 @@ export default {
             await changeOwners(responsibilityTerm.pet_id, adopter, donator);
             res.status(200).send({ ok: true });
         }
+    },
+
+    async update(req,res){
+        if(res.statusCode == 200){
+            const { responsibilityTerm } = req.body;
+
+            let erros = await validateUpdate(responsibilityTerm);
+            if (erros) return res.status(403).send({erros});
+
+            await updateResponsibilityTerm(responsibilityTerm);
+            res.status(200).send({ ok: true });
+        }        
     }
     
 }

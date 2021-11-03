@@ -41,7 +41,7 @@ pool.getConnection((err, connection) => {
         foundation date
         
     );`)
-//adoptable and adopted as varchar(3) as they should only accept 'sim' and 'não'
+
     connection.query(`CREATE TABLE IF NOT EXISTS pets (
         id varchar(255) not null primary key,
         avatar_url varchar(255) not null,
@@ -66,12 +66,12 @@ pool.getConnection((err, connection) => {
         description varchar(4000) not null,
         constraint fk_pet_id foreign key (pet_id) references pets (id) ON DELETE CASCADE
     );`)
-
     connection.query(`CREATE TABLE IF NOT EXISTS responsibilityTerm (
         id varchar(255) not null primary key,
-        donator_identifier varchar(255) not null,
-        adopter_identifier varchar(255) not null,        
+        donator_identifier varchar(255),
+        adopter_identifier varchar(255),      
         pet_id varchar(255) not null,
+        status varchar(255) not null,
         constraint fk_pet_idT foreign key (pet_id) references pets (id) ON DELETE CASCADE
     );`)
 })
@@ -404,12 +404,12 @@ export function getPropertyFromPet(property, id){
 
 
 
-//Donation
+//Responsability Term / Donation
 export function createResponsibilityTerm(responsibilityTerm){
     return new Promise(function(resolve,reject){
         pool.getConnection((err,connection)=> {
             if(err) throw err;
-            connection.query(`INSERT INTO responsibilityTerm (id, donator_identifier, adopter_identifier, pet_id) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_identifier}', '${responsibilityTerm.adopter_identifier}', '${responsibilityTerm.pet_id}')`,(err, rows) => {
+            connection.query(`INSERT INTO responsibilityTerm (id, donator_identifier, adopter_identifier, pet_id, status) VALUES ('${responsibilityTerm.id}', '${responsibilityTerm.donator_identifier}', '${responsibilityTerm.adopter_identifier}', '${responsibilityTerm.pet_id}', '${responsibilityTerm.status}')`,(err, rows) => {
                 connection.release();
                 if(err) reject(err);
 
@@ -448,6 +448,33 @@ export function changeOwners(pet_id, adopter, donator){
     });
 }
 
+export function updateResponsibilityTerm(responsibilityTerm){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection)=> {
+            if(err) throw err;
+            connection.query(`UPDATE responsibilityTerm SET donator_identifier = '${responsibilityTerm.donator_identifier}', adopter_identifier = '${responsibilityTerm.adopter_identifier}', pet_id = '${responsibilityTerm.pet_id}', status = '${responsibilityTerm.status}' WHERE id = '${responsibilityTerm.id}'`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(true);
+            });
+        });
+    });
+}
+
+export function checkTermID(value){
+    return new Promise(function(resolve,reject){
+        pool.getConnection((err,connection)=> {
+            if(err) throw err;
+            connection.query(`SELECT * FROM responsibilityTerm WHERE id = '${value}'`,(err, rows) => {
+                connection.release();
+                if(err) reject(err);
+
+                resolve(rows[0]);
+            });
+        });
+    });
+}
 
 // veterinary history
 export function createVetHistory(vetHistory){
