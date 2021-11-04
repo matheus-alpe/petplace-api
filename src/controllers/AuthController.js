@@ -1,5 +1,5 @@
 import JWT from 'jsonwebtoken';
-import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets } from '../db.js';
+import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets, showAllTermsFromUser } from '../db.js';
 
 const SECRET = 'TEST';
 
@@ -73,14 +73,15 @@ export default {
                 }
 
                 const pets = await showUserPets(tempUser) || [];
-                
                 const vetHistory = await showAllVetHistoryFromUserPets(decoded) || [];
+                const terms = await showAllTermsFromUser(tempUser) || [];
 
                 res.status(200).send({
                     token,
                     user: { ...tempUser },
                     pets,
-                    vetHistory
+                    vetHistory,
+                    terms
                 });
             } catch (error) {
                 res.status(401).send({
