@@ -100,8 +100,20 @@ export default {
                 await deleteUser(user);
                 res.status(200).send({ ok: true });
             }
+        }
+    },
 
-            
+    async findUser(req, res) {
+        if(res.statusCode == 200){
+            const { id } = req.body;
+
+            const userResult = await getUserByProperty(id, 'id');
+            if (!userResult) {
+                res.status(404).send({ message: 'user não encontrado' });
+            } else {
+                delete userResult.password;
+                res.status(200).send({ ok: true, userInfo: userResult });
+            }
         }
     }
 };
