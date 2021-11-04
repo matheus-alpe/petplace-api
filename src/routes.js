@@ -18,6 +18,7 @@ routes.get('/load-session', AuthController.validateSession, AuthController.loadS
 routes.post('/register-user', UsersController.create);
 routes.put('/update-user', AuthController.validateSession, UsersController.update);
 routes.post('/delete-user', AuthController.validateSession, UsersController.delete);
+routes.post('/find-user', AuthController.validateSession, UsersController.findUser);
 
 //pets
 routes.post('/register-pet', AuthController.validateSession, PetsController.create);
@@ -36,9 +37,9 @@ routes.post('/search-pet-info', AuthController.validateSession, PetsController.s
 //donation process
 routes.post('/create-term', AuthController.validateSession, TermsController.create);
 
-routes.put('/update-owners', AuthController.validateSession, TermsController.exchange);
-
 routes.put('/update-term', AuthController.validateSession, TermsController.update);
+
+routes.post('/archive-term', AuthController.validateSession, TermsController.archive);
 
 //veterinary history
 routes.post('/create-vetHistory', AuthController.validateSession, VetController.create);

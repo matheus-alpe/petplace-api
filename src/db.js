@@ -15,8 +15,8 @@ import mysql from 'mysql';
  */
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'root',
-    password: 'Melves',
+    user: process.env.BD_USER,
+    password: process.env.BD_PASS,
     database: 'petplace'
 });
 
@@ -601,6 +601,38 @@ export function showAllVetHistoryFromUserPets(user){
 
                 resolve(rows);
             });
+        });
+    });
+}
+
+export function showAllTermsFromUser(user){
+    return new Promise(function(resolve, reject){
+        pool.getConnection((err, connection) =>{
+            if(err) throw err;
+            const identifier = user.cpf || user.cnpj;
+
+            if (!identifier) throw err;
+            connection.query(`select * from responsibilityTerm where responsibilityTerm.donator_identifier = "${identifier}" OR responsibilityTerm.adopter_identifier = "${identifier}";`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(rows);
+            });
+        });
+    });
+}
+
+export function archiveTerms(selectedTerm) {
+    return new Promise(function (resolve, reject) {
+        pool.getConnection((err, connection) => {
+            if (err) throw err;
+            connection.query(`UPDATE responsibilityTerm SET status="arquivado" WHERE pet_id = "${selectedTerm.pet_id}" AND id != "${selectedTerm.id}";`, (err,rows) => {
+                connection.release();
+                if (err) reject(err);
+
+                resolve(true);
+            });
+            
         });
     });
 }
