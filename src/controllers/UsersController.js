@@ -58,11 +58,13 @@ export default {
 
     async create(req, res) {
         const { user } = req.body;
-
+        
         user.id = new Date().toISOString().replace(/[^\w\s]/gi, '')
         if(user.cpf) user.cpf = user.cpf.replace(/[^\w\s]/gi, '')
         if(user.cnpj) user.cnpj = user.cnpj.replace(/[^\w\s]/gi, '')
-        delete user.confirmation
+        if(user.cep) user.cep = user.cep.replace(/[^\w\s]/gi, '')
+        if(user.cellphone) user.cellphone = user.cellphone.replace(/[^\w\s]/gi, '')
+        if(user.telephone) user.telephone = user.telephone.replace(/[^\w\s]/gi, '')
 
         const erros = await validateInputs(user);
         if (erros) {

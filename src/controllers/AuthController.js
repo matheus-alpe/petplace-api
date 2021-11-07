@@ -1,5 +1,5 @@
 import JWT from 'jsonwebtoken';
-import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets, showAllTermsFromUser } from '../db.js';
+import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets, showAllTermsFromUser, getPropertyFromPet } from '../db.js';
 
 const SECRET = 'TEST';
 
@@ -79,18 +79,26 @@ export default {
 
                 if (resultTerms.length) {
                     termResponsibility = await Promise.all(resultTerms.map(async (term) => {
-                        let tempTerm = { ...term }
+                        let tempTerm = { ...term };
                         
-                        if (tempUser.cpf) {
-                            tempTerm.info = await getUserByProperty(term['donator_identifier'], 'cnpj');
-                        }
-
-                        if (tempUser.cnpj) {
-                            tempTerm.info = await getUserByProperty(term['adopter_identifier'], 'cpf');
-                        }
-
-                        if (tempTerm.info && tempTerm.info.password) {
-                            delete tempTerm.info.password;
+                        try {
+                            if (tempUser.cpf) {
+                                tempTerm.info = await getUserByProperty(term['donator_identifier'], 'cnpj');
+                            }
+    
+                            if (tempUser.cnpj) {
+                                tempTerm.info = await getUserByProperty(term['adopter_identifier'], 'cpf');
+                            }
+    
+                            if (tempTerm.pet_id) {
+                                tempTerm.petInfo = await getPropertyFromPet(term['pet_id']);
+                            }
+    
+                            if (tempTerm.info && tempTerm.info.password) {
+                                delete tempTerm.info.password;
+                            }
+                        } catch (error) {
+                            console.log(error)
                         }
 
                         return tempTerm;

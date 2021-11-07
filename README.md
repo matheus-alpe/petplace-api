@@ -39,7 +39,7 @@
 - `/search-pet-by`-- verifica se o token de sessão passado como parâmetro é válido e então mostra os pets de acordo com property e value passados como parâmetro, sendo que property = alguma coluna da tabela de pets e value = um dos valores possiveis para tal coluna
 ######
 
-- `/search-pet-info` -- verifica se o token de sessão passado como parâmetro é válido e então mostra a property passada como parâmetro do pet de id passada por parâmetro, sendo que property = alguma coluna da tabela de pets
+- `/search-pet-info` -- verifica se o token de sessão passado como parâmetro é válido e então pega as informações do pet de acordo com o id passado na request;
 
 ###### Donation Process
 

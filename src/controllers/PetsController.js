@@ -116,16 +116,14 @@ export default {
 
     async searchPetInfo(req,res){
         if(res.statusCode == 200){
+            try {
+                const { id } = req.body;
 
-            const { property, id } = req.body;
-
-            const erros = await validateIfColumn(property);
-            if (erros){
-                res.status(403).send({ erros });
-            }else{
-                const response = await getPropertyFromPet(property,id);
-                res.status(200).send({ response });
-            }   
+                const response = await getPropertyFromPet(id);
+                res.status(200).send({ pet: response });
+            } catch (error) {
+                res.status(403).send({ error });
+            }
         }        
     },
 }

@@ -388,11 +388,11 @@ export function getPetsByProperty(value, property){
     });
 }
 
-export function getPropertyFromPet(property, id){
+export function getPropertyFromPet(id){
     return new Promise(function(resolve,reject){
         pool.getConnection((err, connection) => {
             if (err) throw err;
-            connection.query(`SELECT ${property} FROM pets WHERE id = '${id}'`, (err,rows) => {
+            connection.query(`SELECT * FROM pets WHERE id = '${id}'`, (err,rows) => {
                 connection.release();
                 if(err) reject(err);
 
