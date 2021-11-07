@@ -74,14 +74,35 @@ export default {
 
                 const pets = await showUserPets(tempUser) || [];
                 const vetHistory = await showAllVetHistoryFromUserPets(decoded) || [];
-                const terms = await showAllTermsFromUser(tempUser) || [];
+                let resultTerms = await showAllTermsFromUser(tempUser) || [];
+                let termResponsibility = []
 
+                if (resultTerms.length) {
+                    termResponsibility = await Promise.all(resultTerms.map(async (term) => {
+                        let tempTerm = { ...term }
+                        
+                        if (tempUser.cpf) {
+                            tempTerm.info = await getUserByProperty(term['donator_identifier'], 'cnpj');
+                        }
+
+                        if (tempUser.cnpj) {
+                            tempTerm.info = await getUserByProperty(term['adopter_identifier'], 'cpf');
+                        }
+
+                        if (tempTerm.info && tempTerm.info.password) {
+                            delete tempTerm.info.password;
+                        }
+
+                        return tempTerm;
+                    }));
+                }
+                
                 res.status(200).send({
                     token,
                     user: { ...tempUser },
                     pets,
                     vetHistory,
-                    terms
+                    terms: termResponsibility
                 });
             } catch (error) {
                 res.status(401).send({
