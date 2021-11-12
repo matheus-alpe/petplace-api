@@ -1,5 +1,5 @@
 import JWT from 'jsonwebtoken';
-import { authenticateUser, getUserByProperty } from '../db.js';
+import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets, showAllTermsFromUser, getPropertyFromPet } from '../db.js';
 
 const SECRET = 'TEST';
 
@@ -58,23 +58,65 @@ export default {
         const token = req.headers.authorization.split(' ')[1];
 
         JWT.verify(token, SECRET, async (err, decoded) => {
-            if (err) {
-                return res.status(401).send({
+            try {
+                if (err) {
+                    return res.status(401).send({
+                        message: 'Sua sessão é inválida ou está expirada',
+                    });
+                }
+    
+                const tempUser = await getUserByProperty(decoded.id, 'id');
+                if (!tempUser) {
+                    return res.status(401).send({
+                        message: 'Sua sessão é inválida ou está expirada',
+                    });
+                }
+
+                const pets = await showUserPets(tempUser) || [];
+                const vetHistory = await showAllVetHistoryFromUserPets(decoded) || [];
+                let resultTerms = await showAllTermsFromUser(tempUser) || [];
+                let termResponsibility = []
+
+                if (resultTerms.length) {
+                    termResponsibility = await Promise.all(resultTerms.map(async (term) => {
+                        let tempTerm = { ...term };
+                        
+                        try {
+                            if (tempUser.cpf) {
+                                tempTerm.info = await getUserByProperty(term['donator_identifier'], 'cnpj');
+                            }
+    
+                            if (tempUser.cnpj) {
+                                tempTerm.info = await getUserByProperty(term['adopter_identifier'], 'cpf');
+                            }
+    
+                            if (tempTerm.pet_id) {
+                                tempTerm.petInfo = await getPropertyFromPet(term['pet_id']);
+                            }
+    
+                            if (tempTerm.info && tempTerm.info.password) {
+                                delete tempTerm.info.password;
+                            }
+                        } catch (error) {
+                            console.log(error)
+                        }
+
+                        return tempTerm;
+                    }));
+                }
+                
+                res.status(200).send({
+                    token,
+                    user: { ...tempUser },
+                    pets,
+                    vetHistory,
+                    terms: termResponsibility
+                });
+            } catch (error) {
+                res.status(401).send({
                     message: 'Sua sessão é inválida ou está expirada',
                 });
             }
-
-            const tempUser = await getUserByProperty(decoded.id, 'id');
-            if (!tempUser) {
-                return res.status(401).send({
-                    message: 'Sua sessão é inválida ou está expirada',
-                });
-            }
-
-            res.status(200).send({
-                token,
-                user: { ...tempUser },
-            });
         });
     },
 };
