@@ -1,7 +1,7 @@
 import JWT from 'jsonwebtoken';
 import { authenticateUser, getUserByProperty, showAllVetHistoryFromUserPets, showUserPets, showAllTermsFromUser, getPropertyFromPet } from '../db.js';
 
-const SECRET = 'TEST';
+const SECRET = 'USJ';
 
 export default {
     async authenticate(req, res) {
@@ -9,24 +9,20 @@ export default {
 
         let result = await authenticateUser(email, password);
 
-        if (!result)
-            return res
-                .status(403)
-                .send({ message: 'E-mail ou Senha incorreto.' });
+        if (!result) {
+            res.status(403).send({ message: 'E-mail ou Senha incorreto.' });
+            return;
+        }
 
         const user = { ...result };
 
-        const token = JWT.sign(user, SECRET, {
-            expiresIn: 7200,
-        });
+        const token = JWT.sign(user, SECRET);
 
         res.status(200).send({
             message: 'Login efetuado com sucesso',
             token,
             user,
         });
-
-        return;
     },
 
     validateSession(req, res, next) {
@@ -46,10 +42,10 @@ export default {
                 res.status(401).send({
                     message: 'Sua sessão está expirada.'
                 });
+                return;
             }
 
             req.data = decoded;
-
             next();
         });
     },
@@ -60,16 +56,18 @@ export default {
         JWT.verify(token, SECRET, async (err, decoded) => {
             try {
                 if (err) {
-                    return res.status(401).send({
+                    res.status(401).send({
                         message: 'Sua sessão é inválida ou está expirada',
                     });
+                    return;
                 }
     
                 const tempUser = await getUserByProperty(decoded.id, 'id');
                 if (!tempUser) {
-                    return res.status(401).send({
+                    res.status(401).send({
                         message: 'Sua sessão é inválida ou está expirada',
                     });
+                    return;
                 }
 
                 const pets = await showUserPets(tempUser) || [];
