@@ -16,7 +16,9 @@ export default {
 
         const user = { ...result };
 
-        const token = JWT.sign(user, SECRET);
+        const token = JWT.sign(user, SECRET, {
+            expiresIn: '1d'
+        });
 
         res.status(200).send({
             message: 'Login efetuado com sucesso',
