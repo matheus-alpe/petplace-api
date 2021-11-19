@@ -2,7 +2,7 @@
 
 ## Backend of a system for donation and adoption of pets
 
-## Status of the Project: In developing
+## Status of the Project: In development
 
 ### Routes
 
